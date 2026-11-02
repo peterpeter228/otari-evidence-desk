@@ -1,9 +1,21 @@
 // Opt-in private CLI only. Server remains fixture-only. No automatic credential discovery.
+import {isDedicatedOtariKey} from './credential-format.js';
 import {readFileSync,mkdirSync,writeFileSync,renameSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
-import {OtariProvider,CURATED_TEXTS,EXTRACT_SYSTEM,REVIEW_SYSTEM} from './provider.js';
+import {OtariProvider,GatewayResponseError,CURATED_TEXTS,EXTRACT_SYSTEM,REVIEW_SYSTEM} from './provider.js';
 import {runPipeline} from './pipeline.js';import {DurableBudgetLedger} from './durable-budget.js';
+export const APPROVED_EXTRACTOR='alibaba/qwen-3.5-35b-a3b';
+export const APPROVED_REVIEWER='openai/gpt-oss-20b';
+export function assertApprovedModels(c){if(c?.extractModel!==APPROVED_EXTRACTOR||c?.reviewModel!==APPROVED_REVIEWER)throw Error('APPROVED_MODEL_SCOPE_REQUIRED');}
+// Exact user-approved model identities, including independently verified same-model offerings.
+export const APPROVED_SERVED_IDENTITIES=Object.freeze({
+ [APPROVED_EXTRACTOR]:Object.freeze([APPROVED_EXTRACTOR,'deepinfra:Qwen/Qwen3.5-35B-A3B','deepinfra:alibaba/qwen-3.5-35b-a3b']),
+ [APPROVED_REVIEWER]:Object.freeze([APPROVED_REVIEWER,'deepinfra:openai/gpt-oss-20b'])
+});
+export function assertServedIdentity(role,result){const requested=role==='extractor'?APPROVED_EXTRACTOR:APPROVED_REVIEWER;const served=result.trace.modelServed;if(!served)throw new GatewayResponseError('SERVED_MODEL_UNVERIFIED',result.trace);if(!APPROVED_SERVED_IDENTITIES[requested].includes(served))throw new GatewayResponseError('SERVED_MODEL_SCOPE_MISMATCH',result.trace);}
 export function validateAcceptanceConfig(c,now=Date.now(),{discoveryOnly=false}={}){
+ assertApprovedModels(c);
+ if(!['enforced_two_models','not_enforced_user_approved_temporary'].includes(c.authorization?.nativeModelRestriction))throw Error('NATIVE_MODEL_RESTRICTION_STATUS_REQUIRED');
  if(c?.authorized!==true||c?.authorization?.maxSpendUsd!==1||c.authorization.creditOnly!==true||c.authorization.nativeBudgetLimitUsd!==1||c.authorization.nativeBudgetReset!=='never')throw Error('EXPLICIT_AUTHORIZATION_REQUIRED: $1 no-reset native cap and free-credit-only operator attestation required');
  if(discoveryOnly){if(!c.extractModel||!c.reviewModel||c.extractModel===c.reviewModel)throw Error('DISTINCT_MODELS_REQUIRED');if(c.apiKey!==undefined||c.secretFile&&!['.secrets/otari-api-key','.env.live'].includes(c.secretFile))throw Error('SECRET_CONFIG_FORBIDDEN');return c;}
  if(c.responseFormat!=='json_object'||c.jsonModeVerified!==true)throw Error('VERIFIED_JSON_MODE_REQUIRED');
@@ -27,7 +39,7 @@ export function redact(value,secret){const text=JSON.stringify(value);return JSO
 export function sanitizedEvidence(report,secret){return redact( {schemaVersion:1,mode:'LIVE',createdAt:report.createdAt,id:report.id,submissionReady:false,sourceMode:'synthetic acceptance fixtures',claims:report.claims.map(c=>({id:c.id,verdict:c.verdict,citationVerified:c.citationVerified})),trace:report.trace.map(t=>({role:t.role,requestId:t.requestId,modelRequested:t.modelRequested,modelServed:t.modelServed,actualCostUsd:t.actualCostUsd,pricingSource:t.pricingSource,fallback:t.fallback,attemptCount:t.attemptCount,nativeGuardrailStatus:t.nativeGuardrailStatus})),budget:report.budget,nativeCapabilities:'discovered availability is not execution proof',semanticAccuracy:'unverified'},secret);}
 export async function runAcceptance({live=false,execute=false,config,apiKey,ledgerPath,evidencePath,fetchImpl}){
  if(!live)throw Error('EXPLICIT_LIVE_FLAG_REQUIRED');validateAcceptanceConfig(config);
- if(typeof apiKey!=='string'||!apiKey.trim())throw Error('DEDICATED_KEY_REQUIRED');
+ if(!isDedicatedOtariKey(apiKey))throw Error('DEDICATED_KEY_FORMAT_REQUIRED');
  if(!ledgerPath||!evidencePath)throw Error('PRIVATE_OUTPUT_PATHS_REQUIRED');
  const evidenceRunPath=evidencePath.replace(/\.json$/, '')+'.'+crypto.randomUUID()+'.json';
  const ledger=new DurableBudgetLedger(ledgerPath,{perRun:0.10,perUser:1});
@@ -35,22 +47,22 @@ export async function runAcceptance({live=false,execute=false,config,apiKey,ledg
  try{
   if(ledger.snapshot().reservations.some(r=>r.status==='unsettled'))throw Error('BILLING_UNSETTLED: reconcile existing ledger before network');
   await provider.preflight();
-  const availability={modelsDiscovered:true,tools:Array.isArray(provider.tools)?provider.tools.map(t=>({id:t.id||t.name||null,available:t.available===true})):[],capabilityExecutionVerified:false};
+  const availability={nativeModelRestriction:config.authorization.nativeModelRestriction,applicationModelRestriction:[APPROVED_EXTRACTOR,APPROVED_REVIEWER],modelsDiscovered:true,tools:Array.isArray(provider.tools)?provider.tools.map(t=>({id:t.id||t.name||null,available:t.available===true})):[],capabilityExecutionVerified:false};
   if(!execute)return {mode:'LIVE_PREFLIGHT_ONLY',...availability,inferenceCalls:0};
   provider.estimate=(role,payload)=>estimateCall(config,role,payload);
-  const original=provider.complete.bind(provider);provider.complete=async(role,payload)=>{if(++calls>2)throw Error('TWO_CALL_LIMIT');return original(role,payload);};
+  const original=provider.complete.bind(provider);provider.complete=async(role,payload)=>{if(++calls>2)throw Error('TWO_CALL_LIMIT');const result=await original(role,payload);assertServedIdentity(role,result);return result;};
   const report=await runPipeline({question:'Compare the synthetic retention, CSV export and monthly-price policies. Identify contradictions and missing evidence.',sources:CURATED_TEXTS.map((text,i)=>({title:`Synthetic policy ${i+1}`,text}))},{provider,mode:'LIVE',ledger});
-  const evidence=sanitizedEvidence(report,apiKey);mkdirSync(dirname(evidencePath),{recursive:true,mode:0o700});const temp=evidenceRunPath+'.tmp';writeFileSync(temp,JSON.stringify(evidence,null,2),{mode:0o600});renameSync(temp,evidenceRunPath);return {...evidence,evidencePath:evidenceRunPath};
+  const evidence={...sanitizedEvidence(report,apiKey),nativeModelRestriction:config.authorization.nativeModelRestriction,applicationModelRestriction:[APPROVED_EXTRACTOR,APPROVED_REVIEWER]};mkdirSync(dirname(evidencePath),{recursive:true,mode:0o700});const temp=evidenceRunPath+'.tmp';writeFileSync(temp,JSON.stringify(evidence,null,2),{mode:0o600});renameSync(temp,evidenceRunPath);return {...evidence,evidencePath:evidenceRunPath};
  }catch(e){
-  const summary=redact({mode:'LIVE_ACCEPTANCE_BLOCKED',reason:e?.name==='UnknownOutcomeError'?'UNKNOWN_GATEWAY_OUTCOME':(/^[A-Z][A-Z0-9_]{1,80}$/.test(String(e.message).split(':')[0])?String(e.message).split(':')[0]:'LIVE_ACCEPTANCE_FAILED'),requestId:e.requestId||null,callsAttempted:calls,budget:ledger.snapshot(),requiresManualReconciliation:ledger.snapshot().reservations.some(r=>r.status==='unsettled')},apiKey);
+  const summary=redact({mode:'LIVE_ACCEPTANCE_BLOCKED',reason:e?.name==='UnknownOutcomeError'?'UNKNOWN_GATEWAY_OUTCOME':(/^[A-Z][A-Z0-9_]{1,80}$/.test(String(e.message).split(':')[0])?String(e.message).split(':')[0]:'LIVE_ACCEPTANCE_FAILED'),requestId:e.requestId||null,reportedCostUsd:typeof e.actualCostUsd==='number'?e.actualCostUsd:null,servedModel:e.trace?.modelServed||null,callsAttempted:calls,budget:ledger.snapshot(),requiresManualReconciliation:ledger.snapshot().reservations.some(r=>r.status==='unsettled')},apiKey);
   mkdirSync(dirname(evidencePath),{recursive:true,mode:0o700});writeFileSync(evidenceRunPath,JSON.stringify(summary,null,2),{mode:0o600,flag:'wx'});
   const safe=new Error(summary.reason);safe.evidence=summary;safe.evidencePath=evidenceRunPath;throw safe;
  }finally{ledger.close();}
 }
 export async function runDiscovery({live=false,config,apiKey,evidencePath,fetchImpl}){
- if(!live)throw Error('EXPLICIT_LIVE_FLAG_REQUIRED');validateAcceptanceConfig(config,Date.now(),{discoveryOnly:true});if(!apiKey?.trim())throw Error('DEDICATED_KEY_REQUIRED');
+ if(!live)throw Error('EXPLICIT_LIVE_FLAG_REQUIRED');validateAcceptanceConfig(config,Date.now(),{discoveryOnly:true});if(!isDedicatedOtariKey(apiKey))throw Error('DEDICATED_KEY_FORMAT_REQUIRED');
  const provider=new OtariProvider({...config,apiKey,reservationPerCall:0.05,responseFormat:undefined,nativeGuardrailMode:undefined},{fetchImpl});await provider.preflight();
- const evidence=redact({mode:'LIVE_DISCOVERY_ONLY',inferenceCalls:0,liveReady:false,createdAt:new Date().toISOString(),models:provider.models,tools:provider.tools,nativeExecutionVerified:false},apiKey);
+ const evidence=redact({mode:'LIVE_DISCOVERY_ONLY',inferenceCalls:0,liveReady:false,createdAt:new Date().toISOString(),models:provider.models.filter(m=>[APPROVED_EXTRACTOR,APPROVED_REVIEWER].includes(m.id)),tools:provider.tools,nativeExecutionVerified:false,nativeModelRestriction:config.authorization.nativeModelRestriction,applicationModelRestriction:[APPROVED_EXTRACTOR,APPROVED_REVIEWER]},apiKey);
  const path=evidencePath.replace(/\.json$/, '')+'.'+crypto.randomUUID()+'.json';mkdirSync(dirname(path),{recursive:true,mode:0o700});writeFileSync(path,JSON.stringify(evidence,null,2),{mode:0o600,flag:'wx'});return {...evidence,evidencePath:path};
 }
 export async function main(args=process.argv.slice(2),env=process.env){

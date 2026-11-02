@@ -1,4 +1,5 @@
 // One-shot loopback-only secret enrollment. Separate from the application server.
+import {isDedicatedOtariKey} from './credential-format.js';
 import http from 'node:http';import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {openSync,writeFileSync,fsyncSync,closeSync} from 'node:fs';import {fileURLToPath} from 'node:url';
 export function createCredentialEnrollment({destination,timeoutMs=120000,probeOnly=false}={}){
@@ -23,6 +24,7 @@ export function createCredentialEnrollment({destination,timeoutMs=120000,probeOn
    let key=form.get('key');if(key.length>256||!/^[A-Za-z0-9._~+/-]{16,256}=*$/.test(key)){send(400,'Unsupported key format; nothing saved.');key='';return;}
    if(used){send(410,'Enrollment closed.');return;}
    if(probeOnly){if(key!=='openai/gpt-oss-20b'){key='';send(400,'Probe mismatch. No file was written.');return;}used=true;key='';res.once('finish',stop);send(200,'<h1>NONSECRET PROBE PASSED</h1><p>Exact expected public model ID received. No file was written. Listener closing.</p>');return;}
+   if(!isDedicatedOtariKey(key)){key='';send(400,'Dedicated Otari key format required. Nothing saved.');return;}
    used=true;
    let fd;try{fd=openSync(destination,'wx',0o600);writeFileSync(fd,`OTARI_API_KEY=${key}\n`);fsyncSync(fd);}finally{key='';if(fd!==undefined)closeSync(fd);}
    res.once('finish',stop);send(200,'<h1>Saved privately</h1><p>The key was not displayed or sent to a model. This one-time listener is closing. Return to the project workflow.</p>');

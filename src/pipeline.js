@@ -21,7 +21,7 @@ export async function runPipeline(input,{provider=new FixtureProvider(),mode='OF
   if(mode==='LIVE'&&provider.estimate)provider.estimate(role,payload);
   if(mode==='LIVE')reservation=ledger.reserve(localUser,id,provider.config.reservationPerCall);
   try{const result=await provider.complete(role,payload);trace.push(result.trace);if(reservation){ledger.annotate?.(reservation,{role,requestId:safeMeta(result.trace.requestId)||null,modelRequested:safeMeta(result.trace.modelRequested)||null});ledger.settle(reservation,result.trace.actualCostUsd);reservation=undefined;if(result.trace.actualCostUsd===null||result.trace.actualCostUsd>provider.config.reservationPerCall){const error=new Error('BILLING_UNSETTLED: reconcile before independent reviewer call');error.requestId=safeMeta(result.trace.requestId)||null;throw error;}}return result.output;}
-  catch(e){if(reservation){ledger.annotate?.(reservation,{role,requestId:safeMeta(e.requestId)||null});ledger.settle(reservation,null);}throw e;}
+  catch(e){if(reservation){ledger.annotate?.(reservation,{role,requestId:safeMeta(e.requestId)||null,modelRequested:safeMeta(e.trace?.modelRequested)||null});ledger.settle(reservation,typeof e.actualCostUsd==='number'&&Number.isFinite(e.actualCostUsd)&&e.actualCostUsd>=0?e.actualCostUsd:null);}throw e;}
  }
  const extracted=await invoke('extractor',{question:input.question,sources});
  if(!Array.isArray(extracted.claims)||extracted.claims.length>12)throw new Error('INVALID_EXTRACTOR_SCHEMA');

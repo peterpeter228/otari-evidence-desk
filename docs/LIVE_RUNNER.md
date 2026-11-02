@@ -38,3 +38,11 @@ Discovery may be used to obtain pricing metadata before a complete pricing snaps
 - No automatic reconciliation, retry, reroute or budget reset is implemented. Read issuer usage by request ID with explicit authorization before repairing an unsettled record.
 
 Current host/auth drift is explicit: `https://otari.ai/api/v1` + `Otari-Key` observed in hosted UI; the API subdomain/Bearer configuration exists for verified deployment compatibility, never automatic fallback. Only the issuer's two allowed origins are accepted.
+
+## Temporary native-model-scope limitation
+
+The hosted key picker rejected catalog IDs as invalid provider prefixes before creating a key. On 2026-11-02 the owner explicitly approved a temporary platform All models key, still bound to the $1 no-reset budget and expiry. This is **not native two-model restriction**. Evidence must say `not_enforced_user_approved_temporary`. The private CLI hardcodes the only permitted roles: extractor `alibaba/qwen-3.5-35b-a3b`, reviewer `openai/gpt-oss-20b`; any other model, alias or swapped role is rejected before reading the dedicated key or making discovery/inference calls. The generic reusable provider is not the approved execution entrypoint. Do not use this temporary credential in any other tool or project.
+
+## Served-model and finite-billing checks
+
+Requests are hard-restricted to the two approved role IDs. Responses must also identify the same role model via `Otari-Model`, or `body.model` when the header is absent. Only exact canonical IDs or independently verified same-model DeepInfra selectors are accepted; no arbitrary prefix stripping or alias guessing. Missing or mismatched identity stops the run before a second inference. Known finite reported cost/request ID are retained even if output JSON or identity validation fails. Missing billing remains unsettled and frozen. These checks have offline regressions; they do not claim a real response was received.

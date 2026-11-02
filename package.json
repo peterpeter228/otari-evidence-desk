@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test",
-    "check": "node --check src/server.js && node --check src/pipeline.js && node --check src/provider.js && node --check src/source.js && node --check src/budget.js && node --check public/app.js && node --check src/durable-budget.js && node --check src/live-acceptance.js && node --check src/enroll-key.js",
+    "check": "node --check src/server.js && node --check src/pipeline.js && node --check src/provider.js && node --check src/source.js && node --check src/budget.js && node --check public/app.js && node --check src/durable-budget.js && node --check src/live-acceptance.js && node --check src/enroll-key.js && node --check src/credential-format.js",
     "acceptance": "node src/live-acceptance.js",
     "enroll": "node src/enroll-key.js"
   }

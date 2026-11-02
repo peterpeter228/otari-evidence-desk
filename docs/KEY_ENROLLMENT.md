@@ -25,3 +25,11 @@ A real **nonsecret** form rehearsal observed `Origin: null` with `Sec-Fetch-Site
 Reference: [MDN Referrer-Policy — Effect on the Origin header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy#effect_on_the_origin_header), checked 2026-11-02. A successful nonsecret browser rerun is still required before any real enrollment.
 
 2026-11-02 17:39 UTC: independent setup worker reran the actual same-browser public-model-ID copy/paste path after the header correction. The protected form reported **NONSECRET PROBE PASSED**, exact expected public ID received, no file written, listener closing. This proves the rehearsed transfer path only; it is not real credential installation, issuer authentication or a model-call test.
+
+## Stale clipboard protection
+
+A subsequent real-mode attempt received the old **public probe model ID**, not a credential. The setup worker verified only the exact nonsecret marker, removed only that invalid file, and made no authenticated API call. Real enrollment and both CLI paths now reject that marker before file creation or network dispatch.
+
+The format gate accepts only the `otk_v1_` hosted family with a bounded nonempty token body. This family is based on the earlier **masked hosted setup-guide field** (`otk_v1_us_`), not inspection of a current plaintext key. It is a format plausibility check, not authentication, entropy verification or proof of active scope/budget. The [open-source default format adapter](https://github.com/mozilla-ai/otari/blob/main/src/gateway/adapters/api_key_format_adapter.py) instead mints `tk-` keys and is explicitly pluggable; it does not prove the hosted format.
+
+For an approved future rotation, keep the one-time display open until: (1) the issuer's Copy Secret completion signal is visible, (2) the local helper confirms safe storage and a boolean-only format/permission check passes, and (3) an authorized read-only issuer preflight succeeds. Do not inspect or echo the copied secret. If storage contains a known public marker, reject it rather than sending it to the issuer. Any new rotation requires its own authorization.
