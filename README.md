@@ -51,3 +51,5 @@ Before enabling real inference, confirm authorization, deployed OpenAPI, model c
 - Prize, eligibility and payment are organizer decisions, not guaranteed by code or rubric mapping.
 
 See [PRD](docs/PRD.md), [STATE](docs/STATE.md), [TASKS](docs/TASKS.md), [ACCEPTANCE](docs/ACCEPTANCE.md), [rubric mapping](docs/RUBRIC.md), and [owner demo rehearsal](docs/DEMO_RUNBOOK.md).
+
+For an already-authorized dedicated key, a separately reviewed [one-shot loopback enrollment helper](docs/KEY_ENROLLMENT.md) is available. Nonsecret browser rehearsal is required before real use; neither helper tests nor preflight establish live model operation.

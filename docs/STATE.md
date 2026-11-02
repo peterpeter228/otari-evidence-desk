@@ -2,7 +2,7 @@
 
 User authorized starting Otari repository and implementation. New project: Evidence Desk. This is development, not submission, credential creation, deployment or prize assurance.
 
-Implemented locally: zero-dependency Node server, offline two-stage fixture pipeline, quote verification, public-source import restrictions, single-process budget ledger, Otari hosted adapter scaffold, synthetic tests. Responsive UI and JSON/Markdown export implemented; 43 automated tests pass. Independent core review found lookup/DNS/IPv6/unknown-billing issues; all were fixed with regression tests. Browser QA passed exercised offline workflows after stale-result and source-label corrections; see docs/qa/BROWSER_QA.md for exact coverage and limits.
+Implemented locally: zero-dependency Node server, offline two-stage fixture pipeline, quote verification, public-source import restrictions, single-process budget ledger, Otari hosted adapter scaffold, synthetic tests. Responsive UI and JSON/Markdown export implemented; 50 automated tests pass. Independent core review found lookup/DNS/IPv6/unknown-billing issues; all were fixed with regression tests. Browser QA passed exercised offline workflows after stale-result and source-label corrections; see docs/qa/BROWSER_QA.md for exact coverage and limits.
 
 Mode: OFFLINE_FIXTURE. Actual model calls: 0. Actual native Otari features verified: 0. No key read/created, no paid inference. No automatic live activation. Not submission-ready.
 
@@ -11,3 +11,5 @@ Private branch `otari-hackathon` first integration code commit: `b724fc515f424a5
 Blocking live proof: approved credential flow and usage cap; deployed API discovery/model catalog/license/pricing; durable reconciliation and native feature tests. Payment details unresolved and not part of code.
 
 Private opt-in acceptance CLI and durable ledger implemented, 43 offline tests pass. No real credential read or API call yet. Explicit model/tool discovery never marks live ready. Inference waits for dedicated authorized key, issuer budget/credit checks, fresh complete pricing and independent pre-charge review.
+
+One-shot enrollment helper added with isolated dummy tests and exact-model-ID no-write probe. Real credential transfer is pending browser rehearsal and authorization; no actual secret read/write occurred during implementation.

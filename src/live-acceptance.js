@@ -42,7 +42,7 @@ export async function runAcceptance({live=false,execute=false,config,apiKey,ledg
   const report=await runPipeline({question:'Compare the synthetic retention, CSV export and monthly-price policies. Identify contradictions and missing evidence.',sources:CURATED_TEXTS.map((text,i)=>({title:`Synthetic policy ${i+1}`,text}))},{provider,mode:'LIVE',ledger});
   const evidence=sanitizedEvidence(report,apiKey);mkdirSync(dirname(evidencePath),{recursive:true,mode:0o700});const temp=evidenceRunPath+'.tmp';writeFileSync(temp,JSON.stringify(evidence,null,2),{mode:0o600});renameSync(temp,evidenceRunPath);return {...evidence,evidencePath:evidenceRunPath};
  }catch(e){
-  const summary=redact({mode:'LIVE_ACCEPTANCE_BLOCKED',reason:e?.name==='UnknownOutcomeError'?'UNKNOWN_GATEWAY_OUTCOME':String(e.message).split(':')[0],requestId:e.requestId||null,callsAttempted:calls,budget:ledger.snapshot(),requiresManualReconciliation:ledger.snapshot().reservations.some(r=>r.status==='unsettled')},apiKey);
+  const summary=redact({mode:'LIVE_ACCEPTANCE_BLOCKED',reason:e?.name==='UnknownOutcomeError'?'UNKNOWN_GATEWAY_OUTCOME':(/^[A-Z][A-Z0-9_]{1,80}$/.test(String(e.message).split(':')[0])?String(e.message).split(':')[0]:'LIVE_ACCEPTANCE_FAILED'),requestId:e.requestId||null,callsAttempted:calls,budget:ledger.snapshot(),requiresManualReconciliation:ledger.snapshot().reservations.some(r=>r.status==='unsettled')},apiKey);
   mkdirSync(dirname(evidencePath),{recursive:true,mode:0o700});writeFileSync(evidenceRunPath,JSON.stringify(summary,null,2),{mode:0o600,flag:'wx'});
   const safe=new Error(summary.reason);safe.evidence=summary;safe.evidencePath=evidenceRunPath;throw safe;
  }finally{ledger.close();}
@@ -63,4 +63,4 @@ export async function main(args=process.argv.slice(2),env=process.env){
  const report=await runner({live:true,execute:args.includes('--execute'),config,apiKey,ledgerPath:resolve(root,'.private/ledger.json'),evidencePath:resolve(root,'.private/acceptance.json')});
  console.log(JSON.stringify({mode:report.mode,inferenceCalls:report.inferenceCalls??report.trace?.length,artifact:report.evidencePath||null}));
 }
-if(process.argv[1]===fileURLToPath(import.meta.url))main().catch(e=>{console.error(String(e.message).split(':')[0]);process.exitCode=1;});
+if(process.argv[1]===fileURLToPath(import.meta.url))main().catch(e=>{const code=String(e.message).split(':')[0];console.error(/^[A-Z][A-Z0-9_]{1,80}$/.test(code)?code:'LIVE_ACCEPTANCE_FAILED');process.exitCode=1;});

@@ -5,8 +5,8 @@
 ## Executed
 
 - `npm install --package-lock-only --ignore-scripts`: passed; zero dependencies. npm emits environment `http-proxy` deprecation warning (not an application failure).
-- `npm test`: **43 passed, 0 failed**.
-- `npm run check`: all eight application JS files syntax checked successfully.
+- `npm test`: **50 passed, 0 failed**.
+- `npm run check`: all nine application JS files syntax checked successfully.
 - HTTP integration test: loopback server, status route, all 3 assets, full 2-source fixture POST, both role traces, conservative insufficient conclusions.
 - Test coverage includes fabricated source IDs/quotes, duplicate/missing review, contradictory review preservation, input limits, concurrent budget reservations, unknown pricing/billing, no retry on network failure, prompt-injection strings cannot set fixture configuration, private/mixed DNS/address filtering, pinned resolution, redirects, unsupported types, oversized streams, Host/Origin checks.
 - Fixture tests use synthetic data and fake injected fetch responses. They are not hosted gateway proof.
@@ -30,3 +30,9 @@ Fresh-agent pinned DNS lookup now honors Node 24 `options.all`; actual HTTPS loo
 ## Private acceptance-runner tests
 
 Added opt-in/missing-key pre-network rejection, durable crash reservation freeze, exclusive lock, cross-run/restart $1 cap, invalid ledger total rejection, unknown billing request-ID persistence, immutable blocked-run evidence, known-secret redaction, two-call bound, explicit JSON/native-guardrail contract, unknown/stale pricing and no-inference discovery. These are offline injected transport tests, not hosted proof.
+
+## Enrollment helper offline tests
+
+Dummy-only temporary-file tests verify no secret echo, mode 0600, exact Host/Origin and nonce checks, CRLF rejection, no credential GET route, no overwrite, and timeout shutdown. No actual project key or `.env.live` was read/written by these tests.
+
+No-write probe regression accepts only the exact expected public model ID and needs no destination; mismatches cannot install credentials.
