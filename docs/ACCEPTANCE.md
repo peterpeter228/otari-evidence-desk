@@ -5,7 +5,7 @@
 ## Executed
 
 - `npm install --package-lock-only --ignore-scripts`: passed; zero dependencies. npm emits environment `http-proxy` deprecation warning (not an application failure).
-- `npm test`: **28 passed, 0 failed**.
+- `npm test`: **30 passed, 0 failed**.
 - `npm run check`: all six application JS files syntax checked successfully.
 - HTTP integration test: loopback server, status route, all 3 assets, full 2-source fixture POST, both role traces, conservative insufficient conclusions.
 - Test coverage includes fabricated source IDs/quotes, duplicate/missing review, contradictory review preservation, input limits, concurrent budget reservations, unknown pricing/billing, no retry on network failure, prompt-injection strings cannot set fixture configuration, private/mixed DNS/address filtering, pinned resolution, redirects, unsupported types, oversized streams, Host/Origin checks.

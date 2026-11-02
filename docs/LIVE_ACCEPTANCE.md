@@ -1,7 +1,7 @@
 # Live acceptance gate — NOT YET PASSED
 
 1. Explicit permission for credential setup and capped inference; safely configure outside repository. No credentials are currently loaded.
-2. Read deployed OpenAPI on hosted origin; resolve `/api/v1` versus `/v1` drift, not by retrying inference endpoints.
+2. Read deployed OpenAPI on the explicitly selected hosted origin; current onboarding shows `https://otari.ai/api/v1` plus `Otari-Key`, unlike public docs using the API subdomain/Bearer. Select exactly one origin/path/header scheme from verified deployment evidence; never retry inference against alternate hosts/auth schemes.
 3. Authenticated discovery `GET models` and `GET tools`. Select two distinct reachable open-weight IDs, record official model cards/licenses. Check context limits and real price schedule.
 4. Define conservative whole-request reservation including prompt/output/tool billing. Implement durable ledger and reconciliation before HTTP live serving; in-memory accounting loses state at restart.
 5. Verify guardrail profile block availability. `unavailable`, HTTP 502 or missing evidence is not success.

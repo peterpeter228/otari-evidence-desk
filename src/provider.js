@@ -2,15 +2,21 @@
 export class UnknownOutcomeError extends Error { constructor(message,requestId=null){super(message);this.name='UnknownOutcomeError';this.requestId=requestId;} }
 export class OtariProvider {
  constructor(config,{fetchImpl=fetch}={}){this.config=config;this.fetch=fetchImpl;this.ready=false;}
+ authHeaders(){
+  if(this.config.authScheme==='otari-key')return {'Otari-Key':this.config.apiKey};
+  if(this.config.authScheme==='bearer')return {Authorization:`Bearer ${this.config.apiKey}`};
+  throw new Error('AUTH_SCHEME_REQUIRED: explicitly select otari-key or bearer; no automatic retry');
+ }
  async preflight(){
   const c=this.config;
   if(!c.authorized||!c.apiKey||!c.extractModel||!c.reviewModel||c.extractModel===c.reviewModel)throw new Error('LIVE_UNCONFIGURED: explicit authorization and distinct model IDs required');
-  const u=new URL(c.baseUrl);if(u.origin!=='https://api.otari.ai'||!['/api/v1','/v1'].includes(u.pathname.replace(/\/$/,'')))throw new Error('HOSTED_ORIGIN_REQUIRED');
+  const u=new URL(c.baseUrl);if(!['https://otari.ai','https://api.otari.ai'].includes(u.origin)||u.username||u.password||u.search||u.hash||!['/api/v1','/v1'].includes(u.pathname.replace(/\/$/,'')))throw new Error('HOSTED_ORIGIN_REQUIRED');
   if(!c.openWeightEvidence?.[c.extractModel]||!c.openWeightEvidence?.[c.reviewModel])throw new Error('OPEN_WEIGHT_EVIDENCE_REQUIRED');
   if(!Number.isFinite(c.reservationPerCall)||c.reservationPerCall<=0)throw new Error('UNKNOWN_PRICE');
+  const headers=this.authHeaders();
   const base=c.baseUrl.replace(/\/$/,'');
   for(const endpoint of ['models','tools']){
-   const r=await this.fetch(`${base}/${endpoint}`,{headers:{Authorization:`Bearer ${c.apiKey}`},redirect:'error',signal:AbortSignal.timeout(7000)});
+   const r=await this.fetch(`${base}/${endpoint}`,{headers,redirect:'error',signal:AbortSignal.timeout(7000)});
    if(!r.ok)throw new Error(`PREFLIGHT_${endpoint.toUpperCase()}_${r.status}`);
    const body=await r.json();this[endpoint]=body.data||body;
   }
@@ -21,7 +27,7 @@ export class OtariProvider {
   if(!this.ready)throw new Error('LIVE_UNCONFIGURED: preflight required');
   const model=role==='extractor'?this.config.extractModel:this.config.reviewModel;
   const started=Date.now();let response;
-  try{response=await this.fetch(`${this.config.baseUrl.replace(/\/$/,'')}/chat/completions`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(25000),headers:{Authorization:`Bearer ${this.config.apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0,max_tokens:1400,guardrails:[{profile:'prompt-injection',mode:'block'}],messages:[{role:'system',content:role==='extractor'?EXTRACT_SYSTEM:REVIEW_SYSTEM},{role:'user',content:JSON.stringify(payload)}]})});}
+  try{response=await this.fetch(`${this.config.baseUrl.replace(/\/$/,'')}/chat/completions`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(25000),headers:{...this.authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0,max_tokens:1400,guardrails:[{profile:'prompt-injection',mode:'block'}],messages:[{role:'system',content:role==='extractor'?EXTRACT_SYSTEM:REVIEW_SYSTEM},{role:'user',content:JSON.stringify(payload)}]})});}
   catch {throw new UnknownOutcomeError('Gateway outcome unknown; reservation held, no automatic retry');}
   const requestId=response.headers.get('Otari-Request-ID');
   if(!response.ok)throw new UnknownOutcomeError(`Gateway HTTP ${response.status}; reconciliation required, no fallback/retry`,requestId);

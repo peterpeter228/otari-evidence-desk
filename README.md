@@ -39,7 +39,7 @@ In fixture mode steps 2–3 are deterministic non-model fixtures. Live mode is d
 
 ## Otari integration plan
 
-`src/provider.js` targets the hosted origin `https://api.otari.ai`. Current official main docs use `/api/v1`, while old docs show `/v1`: **deployment path remains unverified**. Preflight discovers models/tools, requires two distinct catalog IDs with open-weight evidence and a positive reservation. The adapter requests native block-mode prompt-injection guardrails. It preserves Otari request/provider/model/fallback/attempt headers and cost metadata.
+`src/provider.js` accepts only explicitly configured hosted origins `https://otari.ai` or `https://api.otari.ai` with an explicit `otari-key` or `bearer` auth scheme. On 2026-11-02 the current hosted onboarding UI showed `https://otari.ai/api/v1` and the `Otari-Key` header; public repository docs also describe a different API host/Bearer convention. This UI observation is not a successful API call. No automatic cross-host/auth fallback is allowed. Preflight discovers models/tools, requires two distinct catalog IDs with open-weight evidence and a positive reservation. The adapter requests native block-mode prompt-injection guardrails. It preserves Otari request/provider/model/fallback/attempt headers and cost metadata.
 
 Before enabling real inference, confirm authorization, deployed OpenAPI, model cards, exact pricing/conservative budget, native guardrail availability, and persistent unsettled-cost reconciliation. Never put an API key into source, browser, report or chat. See [live checklist](docs/LIVE_ACCEPTANCE.md).
 
