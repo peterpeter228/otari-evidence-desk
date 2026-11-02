@@ -5,8 +5,8 @@
 ## Executed
 
 - `npm install --package-lock-only --ignore-scripts`: passed; zero dependencies. npm emits environment `http-proxy` deprecation warning (not an application failure).
-- `npm test`: **30 passed, 0 failed**.
-- `npm run check`: all six application JS files syntax checked successfully.
+- `npm test`: **43 passed, 0 failed**.
+- `npm run check`: all eight application JS files syntax checked successfully.
 - HTTP integration test: loopback server, status route, all 3 assets, full 2-source fixture POST, both role traces, conservative insufficient conclusions.
 - Test coverage includes fabricated source IDs/quotes, duplicate/missing review, contradictory review preservation, input limits, concurrent budget reservations, unknown pricing/billing, no retry on network failure, prompt-injection strings cannot set fixture configuration, private/mixed DNS/address filtering, pinned resolution, redirects, unsupported types, oversized streams, Host/Origin checks.
 - Fixture tests use synthetic data and fake injected fetch responses. They are not hosted gateway proof.
@@ -26,3 +26,7 @@ Exact quotes verify provenance only. The fixture cannot reason and marks arbitra
 ## Independent review fixes
 
 Fresh-agent pinned DNS lookup now honors Node 24 `options.all`; actual HTTPS lookup contract regression passes. DNS cap and whole-fetch deadline prevent indefinite source locks. IPv4-only dialing rejects mixed private A answers; AAAA is never dialed. Unknown cost freezes the local user and stops the next paid role. Rejected streams are destroyed instead of drained. These controls were independently rechecked before the final fixture/UI enhancements.
+
+## Private acceptance-runner tests
+
+Added opt-in/missing-key pre-network rejection, durable crash reservation freeze, exclusive lock, cross-run/restart $1 cap, invalid ledger total rejection, unknown billing request-ID persistence, immutable blocked-run evidence, known-secret redaction, two-call bound, explicit JSON/native-guardrail contract, unknown/stale pricing and no-inference discovery. These are offline injected transport tests, not hosted proof.

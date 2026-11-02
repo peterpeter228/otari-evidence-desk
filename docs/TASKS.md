@@ -7,7 +7,8 @@
 - [x] Complete visual browser acceptance and export smoke check (1165/485 px; see exact coverage).
 - [x] Parent review and persist to otari-hackathon; first integration SHA recorded in STATE.
 - [ ] Authorized live config and actual models/tools/OpenAPI discovery.
-- [ ] Durable billing reservations/reconciliation before serving live HTTP.
+- [x] Private opt-in CLI with durable reservations, unknown-cost freeze, immutable evidence and offline tests.
+- [ ] Live verification and manual reconciliation procedure; HTTP live serving remains disabled.
 - [ ] Real dual open-weight model acceptance, citations and injection tests.
 - [ ] Native guardrails/fetch/budget/routing evidence, only if available.
 - [ ] Public-readiness review, judge access, owner demo and honest feedback.

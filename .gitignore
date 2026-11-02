@@ -5,3 +5,6 @@ node_modules/
 coverage/
 artifacts/
 *.log
+.secrets/
+.private/
+.otari-live.json

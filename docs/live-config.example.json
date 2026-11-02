@@ -1,0 +1,15 @@
+{
+  "authorized": false,
+  "authorization": {"maxSpendUsd": 1, "creditOnly": true, "nativeBudgetLimitUsd": 1, "nativeBudgetReset": "never"},
+  "baseUrl": "https://otari.ai/api/v1",
+  "authScheme": "otari-key",
+  "secretFile": ".env.live",
+  "extractModel": "",
+  "reviewModel": "",
+  "openWeightEvidence": {},
+  "responseFormat": "json_object",
+  "jsonModeVerified": false,
+  "nativeGuardrailMode": "off-unverified",
+  "nativeGuardrailsAvailableVerified": false,
+  "pricingSnapshot": {"sourceUrl": "", "verifiedAt": "", "models": {}}
+}

@@ -33,7 +33,7 @@ In fixture mode steps 2–3 are deterministic non-model fixtures. Live mode is d
 - Public/non-sensitive research only. No financial advice, audit assurance or customer records.
 - Sources are untrusted input, not instructions. System prompts and exact-citation validation are separate application defenses, not a guarantee against injection.
 - URL import: HTTPS, no credentials/query/fragment/custom ports; rejects private/reserved destinations and any mixed public/private IPv4 A answers (AAAA is never dialed); IPv6 import is disabled in this MVP; pins resolved IPv4; rejects redirects; 24 KB limit, 7-second whole-fetch deadline (including a 2-second DNS cap), text only. This restrictive importer is **not Otari native web fetch**.
-- In-memory local budget reservations are single-process safeguards, **not authenticated user isolation or native Otari budgets**. Unknown pricing fails closed; unknown billing holds reservations. Restart loses in-memory state. Live HTTP serving is intentionally disabled until persistent accounting is implemented.
+- The web fixture has in-memory local safeguards; the opt-in CLI has durable reservations and an exclusive lock, **not authenticated user isolation or native Otari budgets**. Unknown pricing fails closed; unknown billing holds reservations. The CLI preserves reserved/unknown amounts across restart; live HTTP serving remains intentionally disabled. See [private runner](docs/LIVE_RUNNER.md).
 - No automatic inference retry or app fallback. Native fallback requires an independently verified route policy and execution evidence. Missing reported cost remains `null`, not zero.
 - No database, telemetry, analytics, hosted deployment, key creation or paid inference is included.
 
@@ -41,7 +41,7 @@ In fixture mode steps 2–3 are deterministic non-model fixtures. Live mode is d
 
 `src/provider.js` accepts only explicitly configured hosted origins `https://otari.ai` or `https://api.otari.ai` with an explicit `otari-key` or `bearer` auth scheme. On 2026-11-02 the current hosted onboarding UI showed `https://otari.ai/api/v1` and the `Otari-Key` header; public repository docs also describe a different API host/Bearer convention. This UI observation is not a successful API call. No automatic cross-host/auth fallback is allowed. Preflight discovers models/tools, requires two distinct catalog IDs with open-weight evidence and a positive reservation. The adapter requests native block-mode prompt-injection guardrails. It preserves Otari request/provider/model/fallback/attempt headers and cost metadata.
 
-Before enabling real inference, confirm authorization, deployed OpenAPI, model cards, exact pricing/conservative budget, native guardrail availability, and persistent unsettled-cost reconciliation. Never put an API key into source, browser, report or chat. See [live checklist](docs/LIVE_ACCEPTANCE.md).
+Before enabling real inference, confirm authorization, deployed OpenAPI, model cards, exact pricing/conservative budget, native guardrail availability, and approved unsettled-cost reconciliation. Never put an API key into source, browser, report or chat. See [live checklist](docs/LIVE_ACCEPTANCE.md).
 
 ## Competition handoff
 

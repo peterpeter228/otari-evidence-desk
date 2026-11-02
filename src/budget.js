@@ -12,7 +12,7 @@ export class BudgetLedger {
   settle(id,cost) {
     const r=this.reservations.get(id); if(!r||r.status!=='reserved') throw new Error('INVALID_RESERVATION');
     if(cost===null || !Number.isFinite(cost) || cost<0) {r.status='unsettled';return;}
-    this.users.set(r.user,(this.users.get(r.user)||0)-r.held+cost); r.held=cost;r.status='settled';
+    const overrun=cost>r.held+1e-12;this.users.set(r.user,(this.users.get(r.user)||0)-r.held+cost); r.held=cost;r.status=overrun?'unsettled':'settled';if(overrun)r.reason='actual_cost_exceeded_reservation';
   }
   snapshot(){return {kind:'application-local single process; not authenticated tenant budget',reservations:[...this.reservations.values()]};}
 }
