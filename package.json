@@ -1,0 +1,14 @@
+{
+  "name": "otari-evidence-desk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test",
+    "check": "node --check src/server.js && node --check src/pipeline.js && node --check src/provider.js && node --check src/source.js && node --check src/budget.js && node --check public/app.js"
+  }
+}

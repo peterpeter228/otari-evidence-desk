@@ -1,0 +1,48 @@
+Offline verification: 2026-11-02 UTC
+v24.22.1
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> otari-evidence-desk@0.1.0 test
+> node --test
+
+✔ fixture complete, explicitly non AI, no model calls (3.510427ms)
+✔ input question and source count enforced (0.351311ms)
+✔ source length, title and mutually exclusive inputs enforced (0.268569ms)
+✔ exact citation and reviewer evidence required (0.152466ms)
+✔ review hallucination, missing and duplicate review fail closed (0.174869ms)
+✔ contradiction retained rather than coerced to support (0.146577ms)
+✔ duplicate claims and malformed schema rejected (0.454224ms)
+✔ budget reservations atomic across concurrent starts (0.412232ms)
+✔ unknown billing holds reservation, no zeroing or retry (0.421245ms)
+✔ unknown and invalid price fail closed; actual cost reconciles (0.333745ms)
+✔ SSRF private, metadata, mapped and reserved addresses blocked (4.166009ms)
+✔ URL policy and mixed DNS answers block bypass (0.874487ms)
+✔ source fetching pins public DNS result and rejects redirects (1.454137ms)
+✔ live unconfigured cannot silently fixture fallback (0.33687ms)
+✔ gateway discovers models then tools; no guessed IDs (2.870728ms)
+✔ gateway missing cost stays unknown; real headers preserved (1.363924ms)
+✔ network ambiguity makes exactly one attempt and never fallback (0.221058ms)
+✔ local server rejects hostile host and cross origin (29.923682ms)
+✔ HTTP fixture end-to-end and static assets (21.532106ms)
+✔ source prompt injection does not alter fixture mode, roles, or budget (1.328651ms)
+✔ source fetch rejects unsupported content and oversize streams (0.94386ms)
+✔ live failure keeps reservation unsettled and makes one call (0.271603ms)
+✔ actual Node HTTPS lookup contract supports options.all (6.536324ms)
+✔ unknown cost freezes subsequent reviewer and future local user calls (0.489746ms)
+✔ IPv6 transitional and documentation forms fail closed (0.149852ms)
+✔ stalled DNS has bounded failure (2001.616523ms)
+✔ curated exact fixture illustrates all verdicts without implying model reasoning (1.801497ms)
+✔ IPv4-only import pins public A record and never falls back to AAAA (0.698887ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2181.419822
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> otari-evidence-desk@0.1.0 check
+> node --check src/server.js && node --check src/pipeline.js && node --check src/provider.js && node --check src/source.js && node --check src/budget.js && node --check public/app.js
+
