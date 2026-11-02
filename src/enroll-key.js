@@ -5,7 +5,7 @@ export function createCredentialEnrollment({destination,timeoutMs=120000,probeOn
  if(!destination&&!probeOnly)throw Error('DESTINATION_REQUIRED');const nonce=randomBytes(32).toString('hex');let used=false;let timer;
  const stop=()=>{clearTimeout(timer);server.close();server.closeIdleConnections();};
  const server=http.createServer(async(req,res)=>{
-  res.setHeader('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");res.setHeader('Cache-Control','no-store');res.setHeader('Pragma','no-cache');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
+  res.setHeader('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");res.setHeader('Cache-Control','no-store');res.setHeader('Pragma','no-cache');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');
   const send=(code,text)=>{res.writeHead(code,{'Content-Type':'text/html; charset=utf-8'});res.end(text);};
   const port=server.address()?.port;const allowedHosts=[`127.0.0.1:${port}`,`localhost:${port}`];const host=req.headers.host;
   if(!allowedHosts.includes(host)){send(403,'Forbidden host.');return;}
@@ -14,7 +14,7 @@ export function createCredentialEnrollment({destination,timeoutMs=120000,probeOn
    send(200,`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Private Otari credential enrollment</title><h1>${probeOnly?'NONSECRET transport probe — openai/gpt-oss-20b only':'Save the dedicated Otari project key'}</h1><p>${probeOnly?'Probe mode never writes a file. Do not paste a credential. ':''}Local one-time form. Never paste this key into chat. No API call is made. This listener closes after saving or after two minutes.</p><form method="post" action="/enroll" autocomplete="off"><input type="hidden" name="nonce" value="${nonce}"><label>Dedicated project key <input type="password" name="key" autocomplete="new-password" required minlength="16" maxlength="256" autofocus></label><button type="submit">Save once to private project configuration</button></form></html>`);return;
   }
   if(req.method!=='POST'||req.url!=='/enroll'){send(404,'Not found.');return;}
-  if(req.headers.origin!==`http://${host}`||req.headers['sec-fetch-site']&&!['same-origin','none'].includes(req.headers['sec-fetch-site'])){send(403,'Same-origin form required.');return;}
+  if(req.headers.origin!==`http://${host}`||req.headers['sec-fetch-site']&&!['same-origin','none'].includes(req.headers['sec-fetch-site'])){const origin=req.headers.origin===undefined?'missing':req.headers.origin==='null'?'null':req.headers.origin===`http://${host}`?'exact-match':'other';const site=['same-origin','same-site','cross-site','none'].includes(req.headers['sec-fetch-site'])?req.headers['sec-fetch-site']:'missing-or-other';send(403,probeOnly?`Same-origin form required. Probe-only metadata: origin=${origin}; sec-fetch-site=${site}; method=POST; path=/enroll; host=validated-loopback.`:'Same-origin form required.');return;}
   if(!/^application\/x-www-form-urlencoded(?:;|$)/i.test(req.headers['content-type']||'')){send(415,'Form encoding required.');return;}
   try{
    let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;if(size>1024){send(413,'Input too large.');req.destroy();return;}chunks.push(chunk);}

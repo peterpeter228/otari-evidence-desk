@@ -17,3 +17,11 @@ The helper serves a password form for two minutes. Paste only the dedicated rest
 Controls: exact loopback Host and same Origin; hidden random CSRF nonce; CSP forbids external loads and framing; no-store; 1024-byte request limit; strict single key/nonce fields, bounded RFC6750 token characters, and no whitespace/CRLF/quotes; exclusive `wx` write to the fixed project `.env.live` with 0600 mode; no overwrite; no GET credential route; no key logging or echo. Successful submission closes the listener. Timeout closes connections. Existing/partial configuration is not silently replaced.
 
 The secret stays on loopback and local disk, not a hosted web endpoint. Local same-user malware or a compromised browser/OS is outside this helper's protection. Do not expose port 8790, bind to all interfaces, proxy the route or leave the listener running. If secure browser copy/paste is unavailable, stop and ask for a supported secure handoff rather than extracting the credential through screenshots, DOM or model-visible tool output.
+
+## Browser Origin compatibility correction
+
+A real **nonsecret** form rehearsal observed `Origin: null` with `Sec-Fetch-Site: same-origin`, while Host/method/path were valid. The original `Referrer-Policy: no-referrer` causes this for navigation-mode form POSTs. The helper now sends `Referrer-Policy: same-origin`: same-origin forms retain their real Origin and cross-origin requests still receive no referrer. Exact Origin/Host/nonce checks remain unchanged; `Origin: null` and cross-site requests still return 403. Probe-only diagnostics expose categorical transport state, never a request body or credential.
+
+Reference: [MDN Referrer-Policy — Effect on the Origin header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy#effect_on_the_origin_header), checked 2026-11-02. A successful nonsecret browser rerun is still required before any real enrollment.
+
+2026-11-02 17:39 UTC: independent setup worker reran the actual same-browser public-model-ID copy/paste path after the header correction. The protected form reported **NONSECRET PROBE PASSED**, exact expected public ID received, no file written, listener closing. This proves the rehearsed transfer path only; it is not real credential installation, issuer authentication or a model-call test.
