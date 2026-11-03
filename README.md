@@ -2,9 +2,9 @@
 
 A small, evidence-first comparison desk: import up to three public source texts or HTTPS pages, inspect cited claims, challenge the claims independently, and export a traceable research brief.
 
-**Current status: hosted dual-model CLI transport and one uncoached synthetic conflict case passed. Web UI remains OFFLINE_FIXTURE. NOT submission-ready; general semantic accuracy and native advanced features remain unverified.**
+**Current status: hosted dual-model CLI transport and one uncoached synthetic conflict case passed. Default web UI remains OFFLINE_FIXTURE; separate private local UI and historical replay are verified, but fresh UI completion is blocked before inference. NOT submission-ready; general semantic accuracy and native advanced features remain unverified.**
 
-On 2026-11-03 a generic-prompt live run preserved eight source-attributed claims and separately identified the Atlas retention conflict using exact 30-day and 14-day source citations, without an expected-answer prompt or explanatory source cue. This is one narrow synthetic case, not a reliability benchmark. All ten integration calls settled to $0.006841. Automated checks:90/90; actual offline browser conflict flow, exports and error recovery verified. See [live evidence and limits](docs/qa/LIVE_ACCEPTANCE_20261103.md).
+On 2026-11-03 a generic-prompt live run preserved eight source-attributed claims and separately identified the Atlas retention conflict using exact 30-day and 14-day source citations, without an expected-answer prompt or explanatory source cue. This is one narrow synthetic case, not a reliability benchmark. All ten integration calls settled to $0.006841. Automated checks:106/106; actual offline browser conflict flow, exports and error recovery verified. See [live evidence and limits](docs/qa/LIVE_ACCEPTANCE_20261103.md) and [local UI QA](docs/qa/LIVE_LOCAL_QA_20261103.md).
 
 ## Run locally
 
@@ -35,7 +35,7 @@ In fixture mode steps 2–3 are deterministic non-model fixtures. Live mode is d
 - Public/non-sensitive research only. No financial advice, audit assurance or customer records.
 - Sources are untrusted input, not instructions. System prompts and exact-citation validation are separate application defenses, not a guarantee against injection.
 - URL import: HTTPS, no credentials/query/fragment/custom ports; rejects private/reserved destinations and any mixed public/private IPv4 A answers (AAAA is never dialed); IPv6 import is disabled in this MVP; pins resolved IPv4; rejects redirects; 24 KB limit, 7-second whole-fetch deadline (including a 2-second DNS cap), text only. This restrictive importer is **not Otari native web fetch**.
-- The web fixture has in-memory local safeguards; the opt-in CLI has durable reservations and an exclusive lock, **not authenticated user isolation or native Otari budgets**. Unknown pricing fails closed; unknown billing holds reservations. The CLI preserves reserved/unknown amounts across restart; live HTTP serving remains intentionally disabled. See [private runner](docs/LIVE_RUNNER.md).
+- The web fixture has in-memory local safeguards; the opt-in CLI has durable reservations and an exclusive lock, **not authenticated user isolation or native Otari budgets**. Unknown pricing fails closed; unknown billing holds reservations. The CLI preserves reserved/unknown amounts across restart; the separate opt-in loopback live UI uses one durable operation and exact origin/CSRF checks. Its first fresh attempt failed at read-only preflight with zero new inference. See [private runner](docs/LIVE_RUNNER.md).
 - No automatic inference retry or app fallback. Native fallback requires an independently verified route policy and execution evidence. Missing reported cost remains `null`, not zero.
 - No database, telemetry, analytics or public hosted deployment is included. The separately authorized private CLI uses gift-credit-billed inference; the default UI never does.
 

@@ -1,6 +1,6 @@
 // Opt-in private CLI only. Server remains fixture-only. No automatic credential discovery.
 import {isDedicatedOtariKey} from './credential-format.js';
-import {readFileSync,mkdirSync,writeFileSync,renameSync} from 'node:fs';
+import {readFileSync,lstatSync,mkdirSync,writeFileSync,renameSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
 import {OtariProvider,GatewayResponseError,inferenceTimeoutMs,extractorReasoningEffort,outputTokenLimit,CURATED_TEXTS,EXTRACT_SYSTEM,REVIEW_SYSTEM} from './provider.js';
 import {runPipeline,syntheticSemanticGate} from './pipeline.js';import {DurableBudgetLedger} from './durable-budget.js';
@@ -70,12 +70,18 @@ export async function runDiscovery({live=false,config,apiKey,evidencePath,fetchI
  const evidence=redact({mode:'LIVE_DISCOVERY_ONLY',inferenceCalls:0,liveReady:false,createdAt:new Date().toISOString(),models:provider.models.filter(m=>[APPROVED_EXTRACTOR,APPROVED_REVIEWER].includes(m.id)),tools:provider.tools,nativeExecutionVerified:false,nativeModelRestriction:config.authorization.nativeModelRestriction,applicationModelRestriction:[APPROVED_EXTRACTOR,APPROVED_REVIEWER]},apiKey);
  const path=evidencePath.replace(/\.json$/, '')+'.'+crypto.randomUUID()+'.json';mkdirSync(dirname(path),{recursive:true,mode:0o700});writeFileSync(path,JSON.stringify(evidence,null,2),{mode:0o600,flag:'wx'});return {...evidence,evidencePath:path};
 }
+export function loadValidatedCredentials(root,{discoveryOnly=false,env=process.env,requireFile=false}={}){
+ const config=JSON.parse(readFileSync(resolve(root,'.otari-live.json'),'utf8'));validateAcceptanceConfig(config,Date.now(),{discoveryOnly});
+ if(requireFile&&!config.secretFile)throw Error('DEDICATED_KEY_FILE_REQUIRED');
+ let apiKey;
+ if(config.secretFile){const path=resolve(root,config.secretFile);const info=lstatSync(path);if(!info.isFile()||(info.mode&0o777)!==0o600)throw Error('DEDICATED_KEY_FILE_PERMISSIONS');
+ const text=readFileSync(path,'utf8');if(config.secretFile==='.env.live'){const match=text.match(/^OTARI_API_KEY=([^\r\n]+)$/m);if(!match)throw Error('DEDICATED_KEY_FILE_INVALID');apiKey=match[1].trim();}else apiKey=text.trim();
+ }else apiKey=env.OTARI_API_KEY;
+ if(!isDedicatedOtariKey(apiKey))throw Error('DEDICATED_KEY_FORMAT_REQUIRED');return {config,apiKey};
+}
 export async function main(args=process.argv.slice(2),env=process.env){
  if(!args.includes('--live'))throw Error('EXPLICIT_LIVE_FLAG_REQUIRED');
- const root=resolve(fileURLToPath(new URL('..',import.meta.url)));const config=JSON.parse(readFileSync(resolve(root,'.otari-live.json'),'utf8'));validateAcceptanceConfig(config,Date.now(),{discoveryOnly:args.includes('--discover')});
- let apiKey;
- if(config.secretFile==='.env.live'){const text=readFileSync(resolve(root,'.env.live'),'utf8');const match=text.match(/^OTARI_API_KEY=([^\r\n]+)$/m);if(!match)throw Error('DEDICATED_KEY_FILE_INVALID');apiKey=match[1].trim();}
- else apiKey=config.secretFile?readFileSync(resolve(root,'.secrets/otari-api-key'),'utf8').trim():env.OTARI_API_KEY;
+ const root=resolve(fileURLToPath(new URL('..',import.meta.url)));const {config,apiKey}=loadValidatedCredentials(root,{discoveryOnly:args.includes('--discover'),env});
  const runner=args.includes('--discover')?runDiscovery:runAcceptance;
  const report=await runner({live:true,execute:args.includes('--execute'),config,apiKey,ledgerPath:resolve(root,'.private/ledger.json'),evidencePath:resolve(root,'.private/acceptance.json')});
  console.log(JSON.stringify({mode:report.mode,inferenceCalls:report.inferenceCalls??report.trace?.length,artifact:report.evidencePath||null}));

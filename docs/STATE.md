@@ -1,3 +1,15 @@
+# Current state — 2026-11-03 04:41 UTC
+
+**PRIVATE_LOCAL_UI_IMPLEMENTED / VERIFIED_LIVE_REPLAY / FRESH_UI_PREFLIGHT_BLOCKED / NOT_SUBMISSION_READY.**
+
+106/106 offline tests and complete syntax checks pass after independent review. The isolated opt-in loopback UI uses the reviewed fixed synthetic acceptance runner, exact model roles, existing durable budget, a fsynced single-operation claim, strict Host/Origin/CSRF, and read-only replay/polling. No startup inference, automatic retry or restart resume is allowed.
+
+Real browser replay of the previously verified uncoached CLI artifact passed, with original timestamp, eight claims, the separate 30/14-day conflict, cost and trace. The replay is explicitly historical and incurs no new model charge. The fresh UI operation failed during read-only models discovery; native browser runtime diagnostic reported ECONNREFUSED. Zero inference dispatch and zero new reservations were verified. The consumed operation remains frozen; it was not reset or retried. Earlier CLI evidence remains valid: ten model calls, $0.006841 total, all settled.
+
+See [local UI QA](qa/LIVE_LOCAL_QA_20261103.md), [bounded failure evidence](qa/LIVE_LOCAL_BLOCKED_20261103.json), and [participant recording checklist](LOCAL_DEMO_RECORDING.md). Fresh UI provider completion, this UI export readback and mobile/restart-completed browser QA remain unverified. General semantic reliability, native advanced feature enforcement, public judge access, owner demo/feedback and submission remain open. Next: validate ordinary issuer connectivity in an authorized environment before considering a separately reviewed future operation; do not bypass restrictions or erase the consumed record.
+
+## Historical CLI and earlier state snapshots
+
 # State — 2026-11-03 04:24 UTC
 
 ## Latest narrow conflict acceptance — 2026-11-03 04:24 UTC

@@ -1,0 +1,20 @@
+{
+  "mode": "LIVE_ACCEPTANCE_BLOCKED",
+  "reason": "PREFLIGHT_MODELS_NETWORK_ERROR",
+  "callsAttempted": 0,
+  "requiresManualReconciliation": false,
+  "observedAt": "2026-11-03T04:38:31Z",
+  "operationId": "212ca95d-8e7a-4b30-9ff2-225daec1142e",
+  "ledgerReservationsBefore": 10,
+  "ledgerReservationsAfter": 10,
+  "cumulativeSettledUsd": 0.006841,
+  "newInferenceCalls": 0,
+  "newInferenceCostUsd": 0,
+  "readOnlyUnauthenticatedDiagnostic": {
+    "url": "https://otari.ai/api/v1/models",
+    "errorName": "TypeError",
+    "code": "ECONNREFUSED"
+  },
+  "retryPerformed": false,
+  "operationPreserved": true
+}
