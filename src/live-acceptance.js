@@ -3,9 +3,11 @@ import {isDedicatedOtariKey} from './credential-format.js';
 import {readFileSync,mkdirSync,writeFileSync,renameSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
 import {OtariProvider,GatewayResponseError,inferenceTimeoutMs,extractorReasoningEffort,outputTokenLimit,CURATED_TEXTS,EXTRACT_SYSTEM,REVIEW_SYSTEM} from './provider.js';
-import {runPipeline} from './pipeline.js';import {DurableBudgetLedger} from './durable-budget.js';
+import {runPipeline,syntheticSemanticGate} from './pipeline.js';import {DurableBudgetLedger} from './durable-budget.js';
 export const APPROVED_EXTRACTOR='alibaba/qwen-3.5-35b-a3b';
 export const APPROVED_REVIEWER='openai/gpt-oss-20b';
+// No explanatory conflict cue in live acceptance inputs; offline UI fixture remains disclosed.
+export const LIVE_ACCEPTANCE_TEXTS=Object.freeze([CURATED_TEXTS[0],CURATED_TEXTS[1],'Atlas retains activity records for 14 days. Atlas supports CSV export.']);
 export function assertApprovedModels(c){if(c?.extractModel!==APPROVED_EXTRACTOR||c?.reviewModel!==APPROVED_REVIEWER)throw Error('APPROVED_MODEL_SCOPE_REQUIRED');}
 // Exact user-approved model identities, including independently verified same-model offerings.
 export const APPROVED_SERVED_IDENTITIES=Object.freeze({
@@ -39,7 +41,7 @@ export function estimateCall(c,role,payload){
  return {maxInputTokens,maxOutputTokens,estimatedUpperBoundUsd,reservationUsd:0.05};
 }
 export function redact(value,secret){const text=JSON.stringify(value);return JSON.parse(secret?text.split(secret).join('[REDACTED]'):text);}
-export function sanitizedEvidence(report,secret){return redact( {schemaVersion:1,mode:'LIVE',createdAt:report.createdAt,id:report.id,submissionReady:false,sourceMode:'synthetic acceptance fixtures',claims:report.claims.map(c=>({id:c.id,verdict:c.verdict,citationVerified:c.citationVerified})),trace:report.trace.map(t=>({role:t.role,requestId:t.requestId,modelRequested:t.modelRequested,modelServed:t.modelServed,provider:['deepinfra','ovhcloud'].includes(t.provider)?t.provider:null,actualCostUsd:t.actualCostUsd,reportedCostUsdString:t.reportedCostUsdString??null,pricingSource:t.pricingSource,fallback:t.fallback,attemptCount:t.attemptCount,nativeGuardrailStatus:t.nativeGuardrailStatus,outputDiagnostics:t.outputDiagnostics??null})),budget:report.budget,nativeCapabilities:'discovered availability is not execution proof',semanticAccuracy:'unverified'},secret);}
+export function sanitizedEvidence(report,secret){return redact( {schemaVersion:1,mode:'LIVE',createdAt:report.createdAt,id:report.id,submissionReady:false,sourceMode:'synthetic acceptance fixtures',claims:report.claims.map(c=>({id:c.id,text:c.text,verdict:c.verdict,citationVerified:c.citationVerified,reason:c.reason,evidence:c.evidence,reviewEvidence:c.reviewEvidence})),uncertainties:report.uncertainties,conflictAssessment:report.conflictAssessment,syntheticSemanticGate:syntheticSemanticGate(report),trace:report.trace.map(t=>({role:t.role,requestId:t.requestId,modelRequested:t.modelRequested,modelServed:t.modelServed,provider:['deepinfra','ovhcloud'].includes(t.provider)?t.provider:null,actualCostUsd:t.actualCostUsd,reportedCostUsdString:t.reportedCostUsdString??null,pricingSource:t.pricingSource,fallback:t.fallback,attemptCount:t.attemptCount,nativeGuardrailStatus:t.nativeGuardrailStatus,outputDiagnostics:t.outputDiagnostics??null})),budget:report.budget,nativeCapabilities:'discovered availability is not execution proof',semanticAccuracy:'unverified'},secret);}
 export async function runAcceptance({live=false,execute=false,config,apiKey,ledgerPath,evidencePath,fetchImpl}){
  if(!live)throw Error('EXPLICIT_LIVE_FLAG_REQUIRED');validateAcceptanceConfig(config);
  if(!isDedicatedOtariKey(apiKey))throw Error('DEDICATED_KEY_FORMAT_REQUIRED');
@@ -54,7 +56,7 @@ export async function runAcceptance({live=false,execute=false,config,apiKey,ledg
   if(!execute)return {mode:'LIVE_PREFLIGHT_ONLY',...availability,inferenceCalls:0};
   provider.estimate=(role,payload)=>estimateCall(config,role,payload);
   const original=provider.complete.bind(provider);provider.complete=async(role,payload)=>{if(++calls>2)throw Error('TWO_CALL_LIMIT');const result=await original(role,payload);assertServedIdentity(role,result);return result;};
-  const report=await runPipeline({question:'Compare the synthetic retention, CSV export and monthly-price policies. Identify contradictions and missing evidence.',sources:CURATED_TEXTS.map((text,i)=>({title:`Synthetic policy ${i+1}`,text}))},{provider,mode:'LIVE',ledger});
+  const report=await runPipeline({question:'Compare the synthetic retention, CSV export and monthly-price policies. Identify contradictions and missing evidence.',sources:LIVE_ACCEPTANCE_TEXTS.map((text,i)=>({title:`Synthetic policy ${i+1}`,text}))},{provider,mode:'LIVE',ledger});
   const evidence={...sanitizedEvidence(report,apiKey),nativeModelRestriction:config.authorization.nativeModelRestriction,applicationModelRestriction:[APPROVED_EXTRACTOR,APPROVED_REVIEWER]};mkdirSync(dirname(evidencePath),{recursive:true,mode:0o700});const temp=evidenceRunPath+'.tmp';writeFileSync(temp,JSON.stringify(evidence,null,2),{mode:0o600});renameSync(temp,evidenceRunPath);return {...evidence,evidencePath:evidenceRunPath};
  }catch(e){
   const summary=redact({mode:'LIVE_ACCEPTANCE_BLOCKED',reason:e?.name==='UnknownOutcomeError'?'UNKNOWN_GATEWAY_OUTCOME':(/^[A-Z][A-Z0-9_]{1,80}$/.test(String(e.message).split(':')[0])?String(e.message).split(':')[0]:'LIVE_ACCEPTANCE_FAILED'),requestId:e.requestId||null,reportedCostUsd:typeof e.actualCostUsd==='number'?e.actualCostUsd:null,servedModel:e.trace?.modelServed||null,provider:['deepinfra','ovhcloud'].includes(e.trace?.provider)?e.trace.provider:null,outputDiagnostics:e.trace?.outputDiagnostics??null,callsAttempted:calls,budget:ledger.snapshot(),requiresManualReconciliation:ledger.snapshot().reservations.some(r=>r.status==='unsettled')},apiKey);

@@ -75,3 +75,9 @@ The exact raw response model ID `Qwen/Qwen3.5-35B-A3B`, documented on DeepInfra'
 ## Bounded reviewer output cap
 
 Optional `reviewerMaxOutputTokens` defaults to 1400 and accepts only integers 1–4096. Configuration is rejected before secret loading/network if invalid. A shared helper supplies the identical cap to conservative cost/context estimation and the POST `max_tokens`; the extractor remains at 1400. A larger reviewer cap does not change reasoning settings, the 120-second deadline, $0.05 reservation per call, $1 total cap, or freeze/no-retry rules. It addresses an observed reviewer `finish_reason: length`, not a guarantee of successful output.
+
+## Separate source support and conflict acceptance
+
+Reviewer output now includes a separate `conflicts` array with ID, description and at least two exact quotes from distinct sources. Faithfully quoting one source can remain `supported` while the report independently exposes that another source disagrees. Missing/malformed conflict assessments are `unknown`, not evidence of agreement; fabricated or single-source conflict citations fail closed. The UI and Markdown export display conflicts separately from claim verdicts.
+
+The fixed synthetic acceptance artifact retains bounded claim text, exact evidence, reviewer reasons, uncertainty statements and conflict assessments, with dedicated-secret redaction. Raw provider output and reasoning text remain excluded. `syntheticSemanticGate.passed` requires nonempty citation-verified claims and the expected exact S1 30-day/S3 14-day Atlas conflict in one validated conflict record. It is a narrow, explicitly prompted fixture check, not proof of general reasoning or semantic correctness. Transport `LIVE` alone does not pass this gate. This change does not establish whether any earlier run identified the conflict when its semantic fields were not retained.

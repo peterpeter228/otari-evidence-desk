@@ -1,0 +1,271 @@
+{
+  "id": "e2eca33f-2f91-4747-ab78-0233766148ec",
+  "mode": "OFFLINE_FIXTURE",
+  "question": "Compare Atlas and Boreal retention, CSV export and monthly price. Identify contradictory evidence and what we cannot conclude.",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Atlas \u2014 synthetic product policy",
+      "text": "Atlas retains activity records for 30 days. Atlas supports CSV export. Atlas costs $20 per month.",
+      "representation": "pasted-text",
+      "canonicalUrl": null,
+      "retrievedAt": "2026-11-03T04:23:55.325Z",
+      "sha256": "ec9d8d7112bd1bc8d89a6ab62370eef48dfceac3455a3edf5f8202523f11a86c"
+    },
+    {
+      "id": "S2",
+      "title": "Boreal \u2014 synthetic product policy",
+      "text": "Boreal retains activity records for 90 days. Boreal supports CSV export. Boreal costs $35 per month.",
+      "representation": "pasted-text",
+      "canonicalUrl": null,
+      "retrievedAt": "2026-11-03T04:23:55.325Z",
+      "sha256": "cc14e97dbaff77e95f77c656bff601dd7022ff7ec74fba79df32385823773f7e"
+    },
+    {
+      "id": "S3",
+      "title": "Atlas \u2014 synthetic help page",
+      "text": "Atlas retains activity records for 14 days. Atlas supports CSV export. This synthetic source deliberately conflicts with the product policy.",
+      "representation": "pasted-text",
+      "canonicalUrl": null,
+      "retrievedAt": "2026-11-03T04:23:55.325Z",
+      "sha256": "2f8f18b98235150dbc58038717b73f23d7b154e9e66bfaabc030eb9a5b6cc2de"
+    }
+  ],
+  "claims": [
+    {
+      "id": "S1C1",
+      "text": "Atlas retains activity records for 30 days.",
+      "evidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas retains activity records for 30 days."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this source states this period; the cross-source conflict is listed separately.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas retains activity records for 30 days."
+        },
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days."
+        }
+      ]
+    },
+    {
+      "id": "S1C2",
+      "text": "Atlas supports CSV export.",
+      "evidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas supports CSV export."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this literal statement is present in the synthetic source; truth and freshness are not established.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas supports CSV export."
+        }
+      ]
+    },
+    {
+      "id": "S1C3",
+      "text": "Atlas costs $20 per month.",
+      "evidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas costs $20 per month."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this literal statement is present in the synthetic source; truth and freshness are not established.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas costs $20 per month."
+        }
+      ]
+    },
+    {
+      "id": "S2C1",
+      "text": "Boreal retains activity records for 90 days.",
+      "evidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal retains activity records for 90 days."
+        }
+      ],
+      "verdict": "insufficient",
+      "reason": "CURATED FIXTURE: this sentence does not establish a product comparison.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal retains activity records for 90 days."
+        }
+      ]
+    },
+    {
+      "id": "S2C2",
+      "text": "Boreal supports CSV export.",
+      "evidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal supports CSV export."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this literal statement is present in the synthetic source; truth and freshness are not established.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal supports CSV export."
+        }
+      ]
+    },
+    {
+      "id": "S2C3",
+      "text": "Boreal costs $35 per month.",
+      "evidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal costs $35 per month."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this literal statement is present in the synthetic source; truth and freshness are not established.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal costs $35 per month."
+        }
+      ]
+    },
+    {
+      "id": "S3C1",
+      "text": "Atlas retains activity records for 14 days.",
+      "evidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this source states this period; the cross-source conflict is listed separately.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas retains activity records for 30 days."
+        },
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days."
+        }
+      ]
+    },
+    {
+      "id": "S3C2",
+      "text": "Atlas supports CSV export.",
+      "evidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas supports CSV export."
+        }
+      ],
+      "verdict": "supported",
+      "reason": "CURATED FIXTURE EXPECTATION, not AI: this literal statement is present in the synthetic source; truth and freshness are not established.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas supports CSV export."
+        }
+      ]
+    },
+    {
+      "id": "S3C3",
+      "text": "This synthetic source deliberately conflicts with the product policy.",
+      "evidence": [
+        {
+          "sourceId": "S3",
+          "quote": "This synthetic source deliberately conflicts with the product policy."
+        }
+      ],
+      "verdict": "insufficient",
+      "reason": "CURATED FIXTURE: this sentence does not establish a product comparison.",
+      "citationVerified": true,
+      "reviewEvidence": [
+        {
+          "sourceId": "S3",
+          "quote": "This synthetic source deliberately conflicts with the product policy."
+        }
+      ]
+    }
+  ],
+  "conflictAssessment": {
+    "status": "reviewed",
+    "conflicts": [
+      {
+        "id": "X1",
+        "description": "Atlas retention is 30 days in S1 and 14 days in S3.",
+        "evidence": [
+          {
+            "sourceId": "S1",
+            "quote": "Atlas retains activity records for 30 days."
+          },
+          {
+            "sourceId": "S3",
+            "quote": "Atlas retains activity records for 14 days."
+          }
+        ],
+        "citationVerified": true
+      }
+    ],
+    "note": "Exact citations verified; conflict semantics remain model-assessed."
+  },
+  "uncertainties": [
+    "CURATED OFFLINE FIXTURE: verdicts are predefined expected outcomes for these exact synthetic texts, not model reasoning.",
+    "Source authority, freshness, missing criteria and the final comparison require live independent review.",
+    "Cross-source conflicts remain unresolved even where individual quotations are source-supported.",
+    "Some claims are contradicted or insufficient; do not treat this report as a verified recommendation."
+  ],
+  "trace": [
+    {
+      "role": "extractor",
+      "modelRequested": "fixture:not-a-model",
+      "modelServed": null,
+      "requestId": null,
+      "actualCostUsd": 0,
+      "pricingSource": "no network/model call",
+      "mode": "OFFLINE_FIXTURE",
+      "nativeToolCalls": []
+    },
+    {
+      "role": "reviewer",
+      "modelRequested": "fixture:not-a-model",
+      "modelServed": null,
+      "requestId": null,
+      "actualCostUsd": 0,
+      "pricingSource": "no network/model call",
+      "mode": "OFFLINE_FIXTURE",
+      "nativeToolCalls": []
+    }
+  ],
+  "budget": {
+    "kind": "fixture: no model calls",
+    "actualCostUsd": 0
+  },
+  "createdAt": "2026-11-03T04:23:55.325Z",
+  "submissionReady": false,
+  "verificationScope": "Exact quote presence is deterministic; semantic support is model-assessed, not independently proven."
+}

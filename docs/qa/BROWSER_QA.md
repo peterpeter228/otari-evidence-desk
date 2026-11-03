@@ -27,3 +27,7 @@ Tested 16:55–17:02 UTC by a separate QA agent using CUA cloud Chromium against
 - External source fetch success, mobile touch devices, 375 px viewport, full keyboard/a11y audit, malicious oversized POST bodies and paid concurrency.
 
 Verdict: offline demonstration UI is usable for the exercised workflows after fixes. This is not hosted integration or contest submission readiness.
+
+## 2026-11-03 conflict fixture regression
+
+Actual cloud browser clicked synthetic example → Review, showing faithful source-supported claims and a separate S1/S3 30/14 conflict. Markdown and JSON exports were downloaded and read back; conflict-browser-download.md/.json preserve the fixture outputs. Invalid question `short` hid old results and showed the 8–1000 validation error. Example reload and repeat review recovered. Screenshot conflict-fixture-browser.jpg records the fixture conflict UI. This does not test live model inference in the UI.

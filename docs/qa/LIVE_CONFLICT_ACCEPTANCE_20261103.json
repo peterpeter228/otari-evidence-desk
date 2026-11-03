@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "mode": "LIVE",
+  "createdAt": "2026-11-03T04:24:32.056Z",
+  "id": "fa5bed5c-6794-4607-8b5a-f9499f1f2c12",
+  "submissionReady": false,
+  "sourceMode": "synthetic acceptance fixtures",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Source S1 states that Atlas retains activity records for 30 days.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms retention of 30 days",
+      "evidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas retains activity records for 30 days."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas retains activity records for 30 days."
+        }
+      ]
+    },
+    {
+      "id": "C2",
+      "text": "Source S3 states that Atlas retains activity records for 14 days.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms retention of 14 days",
+      "evidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days."
+        }
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "Source S1 states that Atlas costs $20 per month.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms price $20",
+      "evidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas costs $20 per month."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas costs $20 per month."
+        }
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "Source S3 does not contain information regarding the monthly price of Atlas.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote does not mention price",
+      "evidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days. Atlas supports CSV export."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas retains activity records for 14 days. Atlas supports CSV export."
+        }
+      ]
+    },
+    {
+      "id": "C5",
+      "text": "Source S1 states that Atlas supports CSV export.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms CSV export",
+      "evidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas supports CSV export."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S1",
+          "quote": "Atlas supports CSV export."
+        }
+      ]
+    },
+    {
+      "id": "C6",
+      "text": "Source S3 states that Atlas supports CSV export.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms CSV export",
+      "evidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas supports CSV export."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S3",
+          "quote": "Atlas supports CSV export."
+        }
+      ]
+    },
+    {
+      "id": "C7",
+      "text": "Source S2 states that Boreal retains activity records for 90 days.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms retention 90 days",
+      "evidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal retains activity records for 90 days."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal retains activity records for 90 days."
+        }
+      ]
+    },
+    {
+      "id": "C8",
+      "text": "Source S2 states that Boreal costs $35 per month.",
+      "verdict": "supported",
+      "citationVerified": true,
+      "reason": "Quote confirms price $35",
+      "evidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal costs $35 per month."
+        }
+      ],
+      "reviewEvidence": [
+        {
+          "sourceId": "S2",
+          "quote": "Boreal costs $35 per month."
+        }
+      ]
+    }
+  ],
+  "uncertainties": [
+    "Atlas monthly price not mentioned in S3",
+    "Boreal retention not mentioned in S1 or S3",
+    "Cross-source conflicts remain unresolved even where individual quotations are source-supported."
+  ],
+  "conflictAssessment": {
+    "status": "reviewed",
+    "conflicts": [
+      {
+        "id": "X1",
+        "description": "Atlas retention days differ between sources",
+        "evidence": [
+          {
+            "sourceId": "S1",
+            "quote": "Atlas retains activity records for 30 days."
+          },
+          {
+            "sourceId": "S3",
+            "quote": "Atlas retains activity records for 14 days."
+          }
+        ],
+        "citationVerified": true
+      }
+    ],
+    "note": "Exact citations verified; conflict semantics remain model-assessed."
+  },
+  "syntheticSemanticGate": {
+    "scope": "built-in synthetic Atlas retention conflict only",
+    "expectedConflictDetected": true,
+    "nonemptyClaimsCited": true,
+    "passed": true,
+    "generalSemanticAccuracy": "unverified"
+  },
+  "trace": [
+    {
+      "role": "extractor",
+      "requestId": "93eb5749-bfd0-4a10-978a-4b37cef1ba2a",
+      "modelRequested": "alibaba/qwen-3.5-35b-a3b",
+      "modelServed": "Qwen/Qwen3.5-35B-A3B",
+      "provider": "deepinfra",
+      "actualCostUsd": 0.000693,
+      "reportedCostUsdString": "0.000693",
+      "pricingSource": "deployment",
+      "fallback": "false",
+      "attemptCount": "1",
+      "nativeGuardrailStatus": "disabled-explicitly-unverified",
+      "outputDiagnostics": {
+        "finishReason": "stop",
+        "contentLength": 1966,
+        "reasoningLength": null,
+        "parserCategory": "valid_json",
+        "reasoningEffortRequested": "none",
+        "reasoningControlEffect": "unverified"
+      }
+    },
+    {
+      "role": "reviewer",
+      "requestId": "30b7dd9e-bb5b-4dec-b61c-1723d9fabeaa",
+      "modelRequested": "openai/gpt-oss-20b",
+      "modelServed": "openai/gpt-oss-20b",
+      "provider": "deepinfra",
+      "actualCostUsd": 0.000251,
+      "reportedCostUsdString": "0.000251",
+      "pricingSource": "deployment",
+      "fallback": "false",
+      "attemptCount": "1",
+      "nativeGuardrailStatus": "disabled-explicitly-unverified",
+      "outputDiagnostics": {
+        "finishReason": "stop",
+        "contentLength": 1638,
+        "reasoningLength": 4814,
+        "parserCategory": "valid_json",
+        "reasoningEffortRequested": null,
+        "reasoningControlEffect": "unverified"
+      }
+    }
+  ],
+  "budget": {
+    "kind": "application-local single process; not authenticated tenant budget",
+    "reservations": [
+      {
+        "user": "local-session",
+        "run": "63b61879-f0ab-4697-8ff4-a5cbc6e906d9",
+        "held": 0.001477,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "32e7a581-3d83-48c7-b588-cc98764a9254",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b",
+          "reconciliationSource": "https://otari.ai/api/v1/usage/requests/32e7a581-3d83-48c7-b588-cc98764a9254",
+          "costUsdString": "0.001477",
+          "originalOutcome": "UNKNOWN_GATEWAY_OUTCOME",
+          "outputRecovered": false
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "91832fc0-ee61-4403-a5b3-987b58b7d55c",
+        "held": 0.001477,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "13166859-ff58-4d69-94c8-b230e4a8ed4d",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "3c036b67-3cdd-4705-954c-ea6ff603b645",
+        "held": 0.000881,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "c4c3f343-a38c-4582-8fb3-1e9a5f3ee506",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "3c036b67-3cdd-4705-954c-ea6ff603b645",
+        "held": 0.000225,
+        "status": "settled",
+        "evidence": {
+          "role": "reviewer",
+          "requestId": "0aa60059-1fc0-42ae-919f-880f471cea2e",
+          "modelRequested": "openai/gpt-oss-20b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "24367009-0aaa-4fb0-b4a5-736e081396eb",
+        "held": 0.00061,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "e92cd039-ff41-4068-8381-99aaf725d0eb",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "24367009-0aaa-4fb0-b4a5-736e081396eb",
+        "held": 0.00013,
+        "status": "settled",
+        "evidence": {
+          "role": "reviewer",
+          "requestId": "f814159d-6998-4b5e-b0f4-a48176ba07a6",
+          "modelRequested": "openai/gpt-oss-20b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "22e2e7d7-b192-4e6d-8848-e49c377b11d4",
+        "held": 0.000881,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "64220172-20de-4c03-a561-822307f22656",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "22e2e7d7-b192-4e6d-8848-e49c377b11d4",
+        "held": 0.000216,
+        "status": "settled",
+        "evidence": {
+          "role": "reviewer",
+          "requestId": "f531c6cc-3933-420d-8b14-cfe652d2938d",
+          "modelRequested": "openai/gpt-oss-20b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "fa5bed5c-6794-4607-8b5a-f9499f1f2c12",
+        "held": 0.000693,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "93eb5749-bfd0-4a10-978a-4b37cef1ba2a",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "fa5bed5c-6794-4607-8b5a-f9499f1f2c12",
+        "held": 0.000251,
+        "status": "settled",
+        "evidence": {
+          "role": "reviewer",
+          "requestId": "30b7dd9e-bb5b-4dec-b61c-1723d9fabeaa",
+          "modelRequested": "openai/gpt-oss-20b"
+        }
+      }
+    ]
+  },
+  "nativeCapabilities": "discovered availability is not execution proof",
+  "semanticAccuracy": "unverified",
+  "nativeModelRestriction": "not_enforced_user_approved_temporary",
+  "applicationModelRestriction": [
+    "alibaba/qwen-3.5-35b-a3b",
+    "openai/gpt-oss-20b"
+  ]
+}

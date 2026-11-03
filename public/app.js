@@ -70,6 +70,12 @@ function renderReport(report) {
     $('#claim-list').append(card);
   }
   if (!(report.claims || []).length) $('#claim-list').append(el('p', 'No supported claims were extracted. Inspect the uncertainty and trace below.', 'muted'));
+  const conflictSection = el('section', undefined, 'claim');
+  conflictSection.append(el('h3', 'Cross-source conflicts'));
+  if(report.conflictAssessment?.status!=='reviewed')conflictSection.append(el('p', 'Conflict assessment is unknown. Do not infer that sources agree.'));
+  else if(!report.conflictAssessment.conflicts.length)conflictSection.append(el('p', 'Reviewer reported no conflicts; this is not independent proof of consistency.'));
+  for(const conflict of report.conflictAssessment?.conflicts || []){conflictSection.append(el('p',conflict.description));for(const evidence of conflict.evidence || []){const quote=el('blockquote',evidence.quote);quote.append(el('cite',evidence.sourceId));conflictSection.append(quote);}}
+  $('#claim-list').append(conflictSection);
   $('#uncertainties').replaceChildren();
   const uncertainties = report.uncertainties?.length ? report.uncertainties : ['No additional uncertainty was reported; this does not establish source accuracy or completeness.'];
   for (const uncertainty of uncertainties) $('#uncertainties').append(el('li', typeof uncertainty === 'string' ? uncertainty : JSON.stringify(uncertainty)));
@@ -84,6 +90,8 @@ function markdown(report) {
     const uniqueEvidence = [...(claim.evidence || []), ...(claim.reviewEvidence || [])].filter((item, i, all) => all.findIndex(other => other.sourceId === item.sourceId && other.quote === item.quote) === i);
     for (const evidence of uniqueEvidence) lines.push('', ...String(evidence.quote).split('\n').map(line => `> ${line}`), '', `Source: ${evidence.sourceId} · ${(report.sources || []).find(source => source.id === evidence.sourceId)?.title || 'Unknown source'}`);
   }
+  lines.push('', '## Cross-source conflicts', report.conflictAssessment?.status==='reviewed'?'Reviewer assessment; semantic accuracy not independently proven.':'Unknown: conflict assessment missing or malformed.');
+  for(const conflict of report.conflictAssessment?.conflicts || []){lines.push('',conflict.description);for(const evidence of conflict.evidence || [])lines.push(`- ${evidence.sourceId}: ${evidence.quote}`);}
   lines.push('', '## Sources', ...(report.sources || []).flatMap(source => [`- ${source.id}: ${source.title}`, `  URL: ${source.canonicalUrl || 'pasted text'}`, `  Retrieved: ${source.retrievedAt}`, `  SHA-256: ${source.sha256}`]), '', '## Uncertainties', ...(report.uncertainties || []).map(item => `- ${typeof item === 'string' ? item : JSON.stringify(item)}`), '', '## Trace and budget', '```json', JSON.stringify({trace: report.trace, budget: report.budget}, null, 2), '```', '', 'Quotes are source matches, not guarantees of truth.'); return lines.join('\n').replace(/</g, '&lt;');
 }
 function download(format) {

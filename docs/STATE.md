@@ -1,3 +1,23 @@
+# State — 2026-11-03 04:24 UTC
+
+## Latest narrow conflict acceptance — 2026-11-03 04:24 UTC
+
+**LIVE_DUAL_MODEL_TRANSPORT_PASS / SYNTHETIC_CONFLICT_CASE_PASS / NOT_SUBMISSION_READY.**
+
+Run `fa5bed5c-6794-4607-8b5a-f9499f1f2c12` at 04:24:32.056 UTC used a generic reviewer prompt with no Atlas/30/14 answer hint and live source text with no explanatory conflict cue. Eight bounded claims were preserved with source quotes and reviewer reasons. The reviewer separately identified “Atlas retention days differ between sources,” citing S1's exact 30-day sentence and S3's exact 14-day sentence. Source-attributed retention claims remain source-supported rather than being mislabeled false. The deterministic gate verified the expected pair of distinct literal citations. This passes only this single synthetic conflict case, not general accuracy or real-world reliability.
+
+Qwen request `93eb5749-bfd0-4a10-978a-4b37cef1ba2a`: **$0.000693**. GPT-OSS-20B request `30b7dd9e-bb5b-4dec-b61c-1723d9fabeaa`: **$0.000251**. Both served by DeepInfra with stop/valid_json. All ten calls across six controlled runs total **$0.006841**, all settled. No additional API run is implied by this report.
+
+The preceding coached run cost $0.001097; it contained an expected-answer hint and is explicitly excluded as evidence of independent conflict detection. It remains in the accounting audit, not discarded. The final case's claim text and conflict description were independently inspected; general semantic accuracy remains unverified.
+
+**90/90 automated tests and full syntax checks pass.** Actual browser fixture QA: synthetic example → review → source-supported claims plus separate 30/14 conflict; Markdown/JSON downloads read back correctly; invalid short question hid stale results and displayed the 8–1000-character error; reloading example/review recovered. This is offline fixture UI testing, not live UI inference. See `conflict-browser-download.md`, `conflict-browser-download.json`, and `conflict-fixture-browser.jpg` in docs/qa.
+
+Default UI remains OFFLINE_FIXTURE. Native tools, guardrails, routing/fallback and user-budget feature execution are not proven. Remaining work includes broader quality evaluation, a judge-ready live demonstration flow, public visibility only when authorized, the participant's own demo and complete submission materials.
+
+Evidence: [sanitized live conflict artifact](qa/LIVE_CONFLICT_ACCEPTANCE_20261103.json). Historical snapshots below retain earlier failures and limits; current status is this section.
+
+## Earlier state snapshots
+
 # State — 2026-11-03 04:19 UTC
 
 ## Current status
