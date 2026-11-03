@@ -1,3 +1,15 @@
+# Submission monitoring — 2026-11-03 12:06 UTC
+
+**SUBMITTED / ACKNOWLEDGED_BY_REACTION / ELIGIBILITY_AND_RESULT_PENDING.**
+
+The authorized submission was sent on 2026-11-03 at 10:46 UTC with the public development branch and [public edited demo](https://github.com/peterpeter228/otari-evidence-desk/releases/tag/v0.1.0-edited-replay). Submitted code remains `4957ca4edba17cf87a26179b3a03a71d501acc7e`; this status-only update changes no implementation.
+
+The organizer subsequently reacted to that exact submission at 12:06 UTC. This is acknowledgment only, not formal acceptance, approval of demo eligibility, selection, an award, or payment confirmation. No new action was requested in that reaction. Private correspondence and identifiers are deliberately not reproduced in this public repository.
+
+The submitted demonstration uses the participant's own narration with an assistant-operated edited historical replay, not a new continuous live inference session or participant-operated recording. This was disclosed in the submission for organizer review. Original live-UI connectivity limitations and all evidence boundaries below remain unchanged. Continue monitoring for explicit eligibility, supplementary-material requests and final results; do not infer approval from the reaction.
+
+## Earlier engineering snapshots (historical status)
+
 # Current state — 2026-11-03 04:41 UTC
 
 **PRIVATE_LOCAL_UI_IMPLEMENTED / VERIFIED_LIVE_REPLAY / FRESH_UI_PREFLIGHT_BLOCKED / NOT_SUBMISSION_READY.**
