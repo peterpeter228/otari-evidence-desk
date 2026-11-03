@@ -1,5 +1,14 @@
 # Live acceptance — 2026-11-03
 
+Current offline validation: **78/78 tests and full syntax checks pass**. Safe output diagnostics now retain only bounded length counts, enum finish reason and parser category; no raw response or reasoning. These diagnostics were added after the second failed response and cannot reconstruct it retroactively.
+
+## Second, separately authorized run — 2026-11-03 04:14 UTC
+
+The new extractor request `13166859-ff58-4d69-94c8-b230e4a8ed4d` returned enough metadata to establish cost and served model, but failed `INVALID_STRUCTURED_OUTPUT`. Cost **$0.001477** was automatically settled; served model reported `Qwen/Qwen3.5-35B-A3B`. This run made one extractor call and no reviewer call. The two requests total **$0.002954**, with no unsettled reservation after this result. No further call is authorized by this report; diagnosis continues before any new execution.
+
+The failed parser result does not by itself establish truncation, empty content or model noncompliance. These remain hypotheses until safely bounded response metadata is available. No successful dual-model evidence report exists yet. Preserve the exact known costs and both failure artifacts; do not reset the cumulative accounting.
+
+
 ## Latest reconciliation — 2026-11-03 04:13 UTC
 
 **AUTHENTICATION_VERIFIED / FIRST_REQUEST_COST_RECONCILED / DUAL_MODEL_ACCEPTANCE_PENDING.** This section supersedes the historical unsettled status below.

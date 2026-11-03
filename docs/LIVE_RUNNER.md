@@ -56,3 +56,12 @@ Each models/tools GET has a default 20-second deadline, configurable via `prefli
 The official API reference defines paired `usage.cost_usd` (a nonnegative six-decimal USD string) and `usage.pricing_source`. The adapter accepts strict six-decimal strings with a lowercase/underscore source tag of length 1–32 and a safe integer micro-dollar magnitude. Missing or invalid pairs remain unknown and freeze accounting. A priced `"0.000000"` with a valid source is legitimate rounded zero; a zero without its source is not proof of free usage. The original string is retained alongside the numeric accounting amount. Old numeric-only mock fixtures were corrected to the documented wire format rather than silently widening production parsing.
 
 Reference checked 2026-11-03: https://github.com/mozilla-ai/otari/blob/main/docs/api-reference.md#request-id-and-inline-cost
+
+## Structured-output failure diagnostics
+
+Sanitized evidence retains only finish-reason enums, content/reasoning character lengths and a parser category (`missing_or_nonstring_content`, `empty_content`, `invalid_json`, or `valid_json`). It does not retain raw response content or reasoning. Known provider IDs `deepinfra`/`ovhcloud` are preserved; unknown header values become null. A length finish reason is evidence of truncation; output-token counts alone are not. This patch does not alter token limits, reasoning controls, model identity allowlists, accounting or retry policy.
+
+Public documentation checked 2026-11-03:
+- https://deepinfra.com/Qwen/Qwen3.5-35B-A3B/api confirms the exact raw model ID, thinking mode and JSON support.
+- https://docs.deepinfra.com/chat/reasoning documents `reasoning_effort: "none"` generally, but does not explicitly establish its effect on this exact Qwen model.
+- https://github.com/mozilla-ai/otari/blob/main/docs/public/openapi.json includes `reasoning_effort` (including `none`) and `max_completion_tokens` precedence over `max_tokens`; `chat_template_kwargs` is not listed. This public schema is not proof of deployed provider behavior.

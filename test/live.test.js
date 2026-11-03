@@ -32,3 +32,8 @@ test('inference timeout persists freeze; longer deadline cannot authorize retry'
  let calls=0;await assert.rejects(runAcceptance({...w,live:true,execute:true,config:{...config(),inferenceTimeoutMs:120000},apiKey:'otk_v1_synthetic_secret_for_tests_only',fetchImpl:async()=>{calls++;}}),/BILLING_UNSETTLED/);assert.equal(calls,0);
  }finally{clearTimeout(keepAlive);rmSync(w.dir,{recursive:true});}
 });
+test('blocked artifact preserves safe diagnostics/provider, never raw reasoning or answer',async()=>{
+ const w=workspace();try{await assert.rejects(runAcceptance({...w,live:true,execute:true,config:config(),apiKey:'otk_v1_synthetic_secret_for_tests_only',fetchImpl:async url=>url.endsWith('chat/completions')?new Response(JSON.stringify({model:'Qwen/Qwen3.5-35B-A3B',choices:[{finish_reason:'length',message:{content:'private-broken-json',reasoning_content:'private-reasoning'}}],usage:{cost_usd:'0.001477',pricing_source:'deployment'}}),{headers:{'Otari-Provider':'deepinfra'}}):discovery(url)}),e=>{
+ assert.equal(e.evidence.provider,'deepinfra');assert.equal(e.evidence.outputDiagnostics.finishReason,'length');assert.equal(e.evidence.outputDiagnostics.parserCategory,'invalid_json');assert.ok(!JSON.stringify(e.evidence).includes('private-broken'));assert.ok(!JSON.stringify(e.evidence).includes('private-reasoning'));return true;
+ });}finally{rmSync(w.dir,{recursive:true});}
+});

@@ -14,6 +14,11 @@ export function inferenceTimeoutMs(config){
  if(!Number.isInteger(value)||value<1||value>120000)throw new Error('INVALID_INFERENCE_TIMEOUT');
  return value;
 }
+export function outputDiagnostics(body){
+ const choice=body?.choices?.[0],message=choice?.message;
+ const content=message?.content,reasoning=message?.reasoning_content??message?.reasoning;
+ return {finishReason:['stop','length','tool_calls','content_filter','function_call'].includes(choice?.finish_reason)?choice.finish_reason:null,contentLength:typeof content==='string'?content.length:null,reasoningLength:typeof reasoning==='string'?reasoning.length:null,parserCategory:typeof content!=='string'?'missing_or_nonstring_content':content.trim().length===0?'empty_content':'unparsed'};
+}
 export class OtariProvider {
  constructor(config,{fetchImpl=fetch}={}){this.config=config;this.fetch=fetchImpl;this.ready=false;}
  authHeaders(){
@@ -57,8 +62,8 @@ export class OtariProvider {
   if(!response.ok)throw new UnknownOutcomeError(`Gateway HTTP ${response.status}; reconciliation required, no fallback/retry`,requestId);
   let body;try{body=await response.json();}catch{throw new UnknownOutcomeError('Unreadable response; billing outcome unknown',requestId);}
   const cost=parseInlineCost(body.usage);
-  const trace={role,modelRequested:model,modelServed:response.headers.get('Otari-Model')||body.model||null,modelServedSource:response.headers.get('Otari-Model')?'header':body.model?'body':'missing',provider:response.headers.get('Otari-Provider'),requestId,fallback:response.headers.get('Otari-Fallback'),attemptCount:response.headers.get('Otari-Attempt-Count'),latencyMs:Date.now()-started,usage:body.usage||null,actualCostUsd:cost,reportedCostUsdString:cost!==null?body.usage.cost_usd:null,pricingSource:cost!==null?body.usage.pricing_source:null,nativeToolCalls:body.otari_tool_calls||[],nativeGuardrailStatus:this.config.nativeGuardrailMode==='off-unverified'?'disabled-explicitly-unverified':'requested-not-independently-verified',mode:'LIVE'};
-  let output;try{output=JSON.parse(body.choices[0].message.content);}catch{throw new GatewayResponseError('INVALID_STRUCTURED_OUTPUT',trace);}
+  const trace={role,modelRequested:model,modelServed:response.headers.get('Otari-Model')||body.model||null,modelServedSource:response.headers.get('Otari-Model')?'header':body.model?'body':'missing',provider:response.headers.get('Otari-Provider'),requestId,fallback:response.headers.get('Otari-Fallback'),attemptCount:response.headers.get('Otari-Attempt-Count'),latencyMs:Date.now()-started,usage:body.usage||null,actualCostUsd:cost,reportedCostUsdString:cost!==null?body.usage.cost_usd:null,pricingSource:cost!==null?body.usage.pricing_source:null,outputDiagnostics:outputDiagnostics(body),nativeToolCalls:body.otari_tool_calls||[],nativeGuardrailStatus:this.config.nativeGuardrailMode==='off-unverified'?'disabled-explicitly-unverified':'requested-not-independently-verified',mode:'LIVE'};
+  let output;try{if(trace.outputDiagnostics.parserCategory!=='unparsed')throw Error();output=JSON.parse(body.choices[0].message.content);trace.outputDiagnostics.parserCategory='valid_json';}catch{if(trace.outputDiagnostics.parserCategory==='unparsed')trace.outputDiagnostics.parserCategory='invalid_json';throw new GatewayResponseError('INVALID_STRUCTURED_OUTPUT',trace);}
   return {output,trace};
  }
 }
