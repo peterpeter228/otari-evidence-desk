@@ -1,3 +1,21 @@
+# State — 2026-11-03 04:10 UTC
+
+## Current status
+
+OFFLINE_MVP_COMPLETE / AUTHENTICATION_VERIFIED / LIVE_INFERENCE_BLOCKED.
+
+The authorized setup workflow reports safe dedicated credential enrollment and successful authenticated read-only GET models and GET tools (HTTP 200), including both approved model IDs. No credential or private configuration is stored in this repository. Native key scope remains the user-approved temporary All models exception; application role restrictions remain exact. Native budget is $1 with no reset, gift-credit-only; this is distinct from the local accounting ledger.
+
+One extractor inference attempt was dispatched. Its outcome is unknown: no request ID, served model or billed cost was received. Reviewer was not sent. The durable ledger holds $0.05 unsettled and freezes further inference pending manual reconciliation. The account UI observed at 04:09 UTC showed no usage/requests; this is not proof of nonexecution or zero cost. Do not clear the reservation, rotate again, or retry automatically.
+
+The default web application remains OFFLINE_FIXTURE. A successful two-model evidence brief and native feature execution are not yet verified. Not submission-ready. See [sanitized acceptance report](qa/LIVE_ACCEPTANCE_20261103.md).
+
+Tests: 68/68 offline automated tests and syntax checks pass. Read-only preflight now has a bounded 20-second default deadline and sanitized stage-specific errors. Inline cost parsing matches the official paired six-decimal string/source contract, preserving unknown billing rather than silently treating it as zero. No live inference was performed by the code-test worker.
+
+Next step: reconcile the uncertain first request using issuer-supported usage evidence; only an authoritative resolution can determine whether the reservation is settled or released. Public repository publication, contest submission and the participant's own demo remain separate unfinished steps.
+
+## Historical record (superseded where above differs)
+
 # State — 2026-11-02
 
 User authorized starting Otari repository and implementation. New project: Evidence Desk. This is development, not submission, credential creation, deployment or prize assurance.
@@ -17,3 +35,9 @@ One-shot enrollment helper added with isolated dummy tests and exact-model-ID no
 2026-11-02 17:39 UTC: actual nonsecret same-browser enrollment probe passed after standards-based same-origin Referrer-Policy correction; null/cross-site Origin remain rejected. No real credential transfer or model call is claimed by this probe.
 
 Pre-rotation hardening: exact two-model request/served-identity guard, temporary native All-models limitation explicitly labeled, hosted-family format gate rejects stale public clipboard marker, known billing retained on output failures. 57 offline tests pass. Actual dedicated credential authentication and inference remain unverified; no real API call performed by the implementation runner.
+
+## Delayed issuer trace observed after initial timeout
+
+At 04:10 UTC the setup worker refreshed the native issuer UI and found the one matching request, ID `32e7a581-3d83-48c7-b588-cc98764a9254`, reported **Success**, provider DeepInfra, model `Qwen/Qwen3.5-35B-A3B`, duration **68 seconds**, 547 input tokens and 1400 output tokens. The UI displayed total **$0.0015**, with meter amounts input $0.0000766 and output $0.0014. These displayed values are not an exact wire `cost_usd` settlement string; do not substitute the rounded total for authoritative settlement. The browser displayed start time 2026-11-03 13:08:50.139 without verified timezone, so it is not represented as UTC.
+
+This later evidence supersedes any inference from the earlier empty usage list: the issuer reports completed model execution. The client still has no recovered response/citations or exact billed settlement. The immutable original timeout artifact remains unchanged, **$0.05 remains unsettled**, and no reviewer or retry was sent. Preserve the two observations separately: client timeout versus delayed issuer-reported success. Dual-model acceptance is still incomplete. Next step is to recover authoritative settlement and response evidence without resending inference.

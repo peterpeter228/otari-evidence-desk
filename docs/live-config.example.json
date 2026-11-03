@@ -9,6 +9,7 @@
   },
   "baseUrl": "https://otari.ai/api/v1",
   "authScheme": "otari-key",
+  "preflightTimeoutMs": 20000,
   "secretFile": ".env.live",
   "extractModel": "alibaba/qwen-3.5-35b-a3b",
   "reviewModel": "openai/gpt-oss-20b",

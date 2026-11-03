@@ -46,3 +46,13 @@ The hosted key picker rejected catalog IDs as invalid provider prefixes before c
 ## Served-model and finite-billing checks
 
 Requests are hard-restricted to the two approved role IDs. Responses must also identify the same role model via `Otari-Model`, or `body.model` when the header is absent. Only exact canonical IDs or independently verified same-model DeepInfra selectors are accepted; no arbitrary prefix stripping or alias guessing. Missing or mismatched identity stops the run before a second inference. Known finite reported cost/request ID are retained even if output JSON or identity validation fails. Missing billing remains unsettled and frozen. These checks have offline regressions; they do not claim a real response was received.
+
+## Read-only discovery deadline and diagnostics
+
+Each models/tools GET has a default 20-second deadline, configurable via `preflightTimeoutMs` only from 1 to 20000 milliseconds. The same abort signal covers response-body parsing. Errors expose only endpoint-specific timeout, transport, invalid-JSON or HTTP-status codes; raw transport/parser messages and response fragments are never surfaced. Discovery makes one attempt per endpoint and stops on failure. Inference remains at 25 seconds with no retries and unchanged model/budget restrictions. The catalog GET result does not verify inference or pricing completeness.
+
+## Inline cost contract
+
+The official API reference defines paired `usage.cost_usd` (a nonnegative six-decimal USD string) and `usage.pricing_source`. The adapter accepts strict six-decimal strings with a lowercase/underscore source tag of length 1–32 and a safe integer micro-dollar magnitude. Missing or invalid pairs remain unknown and freeze accounting. A priced `"0.000000"` with a valid source is legitimate rounded zero; a zero without its source is not proof of free usage. The original string is retained alongside the numeric accounting amount. Old numeric-only mock fixtures were corrected to the documented wire format rather than silently widening production parsing.
+
+Reference checked 2026-11-03: https://github.com/mozilla-ai/otari/blob/main/docs/api-reference.md#request-id-and-inline-cost

@@ -1,6 +1,14 @@
 // Hosted adapter scaffold. No environment key loading and no automatic live enablement.
 export class UnknownOutcomeError extends Error { constructor(message,requestId=null){super(message);this.name='UnknownOutcomeError';this.requestId=requestId;} }
 export class GatewayResponseError extends Error {constructor(message,trace){super(message);this.name='GatewayResponseError';this.trace=trace;this.requestId=trace.requestId;this.actualCostUsd=trace.actualCostUsd;}}
+// Hosted inline pricing contract: paired six-decimal USD string and source tag.
+export function parseInlineCost(usage){
+ const raw=usage?.cost_usd,source=usage?.pricing_source;
+ if(typeof raw!=='string'||!/^(0|[1-9][0-9]*)\.[0-9]{6}$/.test(raw)||raw.length>24||typeof source!=='string'||! /^[a-z_]{1,32}$/.test(source))return null;
+ const micros=BigInt(raw.replace('.',''));
+ if(micros>BigInt(Number.MAX_SAFE_INTEGER))return null;
+ return Number(micros)/1000000;
+}
 export class OtariProvider {
  constructor(config,{fetchImpl=fetch}={}){this.config=config;this.fetch=fetchImpl;this.ready=false;}
  authHeaders(){
@@ -9,7 +17,10 @@ export class OtariProvider {
   throw new Error('AUTH_SCHEME_REQUIRED: explicitly select otari-key or bearer; no automatic retry');
  }
  async preflight(){
+  this.ready=false;
   const c=this.config;
+  const timeoutMs=c.preflightTimeoutMs??20000;
+  if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>20000)throw new Error('INVALID_PREFLIGHT_TIMEOUT');
   if(!c.authorized||!c.apiKey||!c.extractModel||!c.reviewModel||c.extractModel===c.reviewModel)throw new Error('LIVE_UNCONFIGURED: explicit authorization and distinct model IDs required');
   const u=new URL(c.baseUrl);if(!['https://otari.ai','https://api.otari.ai'].includes(u.origin)||u.username||u.password||u.search||u.hash||!['/api/v1','/v1'].includes(u.pathname.replace(/\/$/,'')))throw new Error('HOSTED_ORIGIN_REQUIRED');
   if(!c.openWeightEvidence?.[c.extractModel]||!c.openWeightEvidence?.[c.reviewModel])throw new Error('OPEN_WEIGHT_EVIDENCE_REQUIRED');
@@ -19,9 +30,12 @@ export class OtariProvider {
   const headers=this.authHeaders();
   const base=c.baseUrl.replace(/\/$/,'');
   for(const endpoint of ['models','tools']){
-   const r=await this.fetch(`${base}/${endpoint}`,{headers,redirect:'error',signal:AbortSignal.timeout(7000)});
-   if(!r.ok)throw new Error(`PREFLIGHT_${endpoint.toUpperCase()}_${r.status}`);
-   const body=await r.json();this[endpoint]=body.data||body;
+   const signal=AbortSignal.timeout(timeoutMs);const prefix=`PREFLIGHT_${endpoint.toUpperCase()}`;let r;
+   try{r=await this.fetch(`${base}/${endpoint}`,{headers,redirect:'error',signal});}
+   catch(e){throw new Error(`${prefix}_${signal.aborted||['TimeoutError','AbortError'].includes(e?.name)?'TIMEOUT':'NETWORK_ERROR'}`);}
+   if(!r.ok)throw new Error(`${prefix}_${r.status}`);
+   let body;try{body=await r.json();}catch(e){throw new Error(`${prefix}_${signal.aborted||['TimeoutError','AbortError'].includes(e?.name)?'TIMEOUT':'INVALID_JSON'}`);}
+   this[endpoint]=body?.data??body;
   }
   if(!Array.isArray(this.models)||![c.extractModel,c.reviewModel].every(id=>this.models.some(m=>m.id===id)))throw new Error('MODEL_NOT_IN_DISCOVERED_CATALOG');
   this.ready=true;return {ready:true,models:[c.extractModel,c.reviewModel],nativeFeatures:'unverified'};
@@ -35,8 +49,8 @@ export class OtariProvider {
   const requestId=response.headers.get('Otari-Request-ID');
   if(!response.ok)throw new UnknownOutcomeError(`Gateway HTTP ${response.status}; reconciliation required, no fallback/retry`,requestId);
   let body;try{body=await response.json();}catch{throw new UnknownOutcomeError('Unreadable response; billing outcome unknown',requestId);}
-  const cost=body.usage?.cost_usd;
-  const trace={role,modelRequested:model,modelServed:response.headers.get('Otari-Model')||body.model||null,modelServedSource:response.headers.get('Otari-Model')?'header':body.model?'body':'missing',provider:response.headers.get('Otari-Provider'),requestId,fallback:response.headers.get('Otari-Fallback'),attemptCount:response.headers.get('Otari-Attempt-Count'),latencyMs:Date.now()-started,usage:body.usage||null,actualCostUsd:typeof cost==='number'&&Number.isFinite(cost)&&cost>=0?cost:null,pricingSource:body.usage?.pricing_source||null,nativeToolCalls:body.otari_tool_calls||[],nativeGuardrailStatus:this.config.nativeGuardrailMode==='off-unverified'?'disabled-explicitly-unverified':'requested-not-independently-verified',mode:'LIVE'};
+  const cost=parseInlineCost(body.usage);
+  const trace={role,modelRequested:model,modelServed:response.headers.get('Otari-Model')||body.model||null,modelServedSource:response.headers.get('Otari-Model')?'header':body.model?'body':'missing',provider:response.headers.get('Otari-Provider'),requestId,fallback:response.headers.get('Otari-Fallback'),attemptCount:response.headers.get('Otari-Attempt-Count'),latencyMs:Date.now()-started,usage:body.usage||null,actualCostUsd:cost,reportedCostUsdString:cost!==null?body.usage.cost_usd:null,pricingSource:cost!==null?body.usage.pricing_source:null,nativeToolCalls:body.otari_tool_calls||[],nativeGuardrailStatus:this.config.nativeGuardrailMode==='off-unverified'?'disabled-explicitly-unverified':'requested-not-independently-verified',mode:'LIVE'};
   let output;try{output=JSON.parse(body.choices[0].message.content);}catch{throw new GatewayResponseError('INVALID_STRUCTURED_OUTPUT',trace);}
   return {output,trace};
  }
