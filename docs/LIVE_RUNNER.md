@@ -49,7 +49,7 @@ Requests are hard-restricted to the two approved role IDs. Responses must also i
 
 ## Read-only discovery deadline and diagnostics
 
-Each models/tools GET has a default 20-second deadline, configurable via `preflightTimeoutMs` only from 1 to 20000 milliseconds. The same abort signal covers response-body parsing. Errors expose only endpoint-specific timeout, transport, invalid-JSON or HTTP-status codes; raw transport/parser messages and response fragments are never surfaced. Discovery makes one attempt per endpoint and stops on failure. Inference remains at 25 seconds with no retries and unchanged model/budget restrictions. The catalog GET result does not verify inference or pricing completeness.
+Each models/tools GET has a default 20-second deadline, configurable via `preflightTimeoutMs` only from 1 to 20000 milliseconds. The same abort signal covers response-body parsing. Errors expose only endpoint-specific timeout, transport, invalid-JSON or HTTP-status codes; raw transport/parser messages and response fragments are never surfaced. Discovery makes one attempt per endpoint and stops on failure. Inference has a separate `inferenceTimeoutMs` default of 120000 milliseconds, configurable only as an integer from 1 to 120000. Its single abort signal covers both POST and response-body reading. Timeout or unreadable response still creates an unknown outcome and freezes the existing reservation; increasing the deadline never reconciles or retries a prior request. There are no retries and model/budget restrictions are unchanged. The catalog GET result does not verify inference or pricing completeness.
 
 ## Inline cost contract
 

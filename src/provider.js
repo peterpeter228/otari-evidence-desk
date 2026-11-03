@@ -9,6 +9,11 @@ export function parseInlineCost(usage){
  if(micros>BigInt(Number.MAX_SAFE_INTEGER))return null;
  return Number(micros)/1000000;
 }
+export function inferenceTimeoutMs(config){
+ const value=config.inferenceTimeoutMs??120000;
+ if(!Number.isInteger(value)||value<1||value>120000)throw new Error('INVALID_INFERENCE_TIMEOUT');
+ return value;
+}
 export class OtariProvider {
  constructor(config,{fetchImpl=fetch}={}){this.config=config;this.fetch=fetchImpl;this.ready=false;}
  authHeaders(){
@@ -19,6 +24,7 @@ export class OtariProvider {
  async preflight(){
   this.ready=false;
   const c=this.config;
+  inferenceTimeoutMs(c);
   const timeoutMs=c.preflightTimeoutMs??20000;
   if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>20000)throw new Error('INVALID_PREFLIGHT_TIMEOUT');
   if(!c.authorized||!c.apiKey||!c.extractModel||!c.reviewModel||c.extractModel===c.reviewModel)throw new Error('LIVE_UNCONFIGURED: explicit authorization and distinct model IDs required');
@@ -42,9 +48,10 @@ export class OtariProvider {
  }
  async complete(role,payload){
   if(!this.ready)throw new Error('LIVE_UNCONFIGURED: preflight required');
+  const timeoutMs=inferenceTimeoutMs(this.config);
   const model=role==='extractor'?this.config.extractModel:this.config.reviewModel;
   const started=Date.now();let response;
-  try{response=await this.fetch(`${this.config.baseUrl.replace(/\/$/,'')}/chat/completions`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(25000),headers:{...this.authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0,max_tokens:1400,...(this.config.nativeGuardrailMode==='off-unverified'?{}:{guardrails:[{profile:'prompt-injection',mode:'block'}]}),...(this.config.responseFormat==='json_object'?{response_format:{type:'json_object'}}:{}),messages:[{role:'system',content:role==='extractor'?EXTRACT_SYSTEM:REVIEW_SYSTEM},{role:'user',content:JSON.stringify(payload)}]})});}
+  try{response=await this.fetch(`${this.config.baseUrl.replace(/\/$/,'')}/chat/completions`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(timeoutMs),headers:{...this.authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0,max_tokens:1400,...(this.config.nativeGuardrailMode==='off-unverified'?{}:{guardrails:[{profile:'prompt-injection',mode:'block'}]}),...(this.config.responseFormat==='json_object'?{response_format:{type:'json_object'}}:{}),messages:[{role:'system',content:role==='extractor'?EXTRACT_SYSTEM:REVIEW_SYSTEM},{role:'user',content:JSON.stringify(payload)}]})});}
   catch {throw new UnknownOutcomeError('Gateway outcome unknown; reservation held, no automatic retry');}
   const requestId=response.headers.get('Otari-Request-ID');
   if(!response.ok)throw new UnknownOutcomeError(`Gateway HTTP ${response.status}; reconciliation required, no fallback/retry`,requestId);

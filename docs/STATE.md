@@ -1,5 +1,16 @@
 # State — 2026-11-03 04:10 UTC
 
+## Latest reconciliation — 2026-11-03 04:13 UTC
+
+**AUTHENTICATION_VERIFIED / FIRST_REQUEST_COST_RECONCILED / DUAL_MODEL_ACCEPTANCE_PENDING.** This section supersedes the historical unsettled status below.
+
+One authorized read-only request to the deployed documented request-settlement endpoint returned HTTP 200 at 04:12:55 UTC for request `32e7a581-3d83-48c7-b588-cc98764a9254`: status success, exact `cost_usd` **`"0.001477"`**, 547 prompt tokens, 1400 completion tokens, 1947 total tokens and row_count 1. Audited manual reconciliation settled that reservation to **$0.001477**; no unsettled reservation remained at reconciliation time. The original client timeout artifact remains immutable. This was not a replay or automatic retry.
+
+The original model output was not recovered: native Log View exposed no input/output. Successful issuer execution and reconciled cost do not prove usable citations or a complete evidence brief. A separately authorized new run may proceed within the existing cumulative $1 gift-credit limit; no result of a subsequent run is claimed here.
+
+The reviewed inference deadline is now 120 seconds by default and maximum, strictly validated before credential/network use. The same abort signal covers POST and response-body parsing. No automatic retries were added; ambiguous outcomes still freeze the durable ledger. Original model roles, two-call maximum and budgets remain unchanged. **74/74 tests pass** with focused syntax checks; source remains private.
+
+
 ## Current status
 
 OFFLINE_MVP_COMPLETE / AUTHENTICATION_VERIFIED / LIVE_INFERENCE_BLOCKED.

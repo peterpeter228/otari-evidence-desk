@@ -2,7 +2,7 @@
 import {isDedicatedOtariKey} from './credential-format.js';
 import {readFileSync,mkdirSync,writeFileSync,renameSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';import {fileURLToPath} from 'node:url';
-import {OtariProvider,GatewayResponseError,CURATED_TEXTS,EXTRACT_SYSTEM,REVIEW_SYSTEM} from './provider.js';
+import {OtariProvider,GatewayResponseError,inferenceTimeoutMs,CURATED_TEXTS,EXTRACT_SYSTEM,REVIEW_SYSTEM} from './provider.js';
 import {runPipeline} from './pipeline.js';import {DurableBudgetLedger} from './durable-budget.js';
 export const APPROVED_EXTRACTOR='alibaba/qwen-3.5-35b-a3b';
 export const APPROVED_REVIEWER='openai/gpt-oss-20b';
@@ -15,6 +15,7 @@ export const APPROVED_SERVED_IDENTITIES=Object.freeze({
 export function assertServedIdentity(role,result){const requested=role==='extractor'?APPROVED_EXTRACTOR:APPROVED_REVIEWER;const served=result.trace.modelServed;if(!served)throw new GatewayResponseError('SERVED_MODEL_UNVERIFIED',result.trace);if(!APPROVED_SERVED_IDENTITIES[requested].includes(served))throw new GatewayResponseError('SERVED_MODEL_SCOPE_MISMATCH',result.trace);}
 export function validateAcceptanceConfig(c,now=Date.now(),{discoveryOnly=false}={}){
  assertApprovedModels(c);
+ inferenceTimeoutMs(c);
  if(!['enforced_two_models','not_enforced_user_approved_temporary'].includes(c.authorization?.nativeModelRestriction))throw Error('NATIVE_MODEL_RESTRICTION_STATUS_REQUIRED');
  if(c?.authorized!==true||c?.authorization?.maxSpendUsd!==1||c.authorization.creditOnly!==true||c.authorization.nativeBudgetLimitUsd!==1||c.authorization.nativeBudgetReset!=='never')throw Error('EXPLICIT_AUTHORIZATION_REQUIRED: $1 no-reset native cap and free-credit-only operator attestation required');
  if(discoveryOnly){if(!c.extractModel||!c.reviewModel||c.extractModel===c.reviewModel)throw Error('DISTINCT_MODELS_REQUIRED');if(c.apiKey!==undefined||c.secretFile&&!['.secrets/otari-api-key','.env.live'].includes(c.secretFile))throw Error('SECRET_CONFIG_FORBIDDEN');return c;}
