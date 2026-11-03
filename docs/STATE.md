@@ -1,3 +1,21 @@
+# State — 2026-11-03 04:19 UTC
+
+## Current status
+
+**HOSTED_DUAL_MODEL_TRANSPORT_PASS / SEMANTIC_ACCEPTANCE_UNVERIFIED / NOT_SUBMISSION_READY.**
+
+A completed synthetic acceptance run at 04:19:15 UTC used Qwen as extractor and GPT-OSS-20B as reviewer through authenticated hosted Otari, both served by DeepInfra. Both returned parseable JSON and stop finish reasons. Seven claims passed literal citation-presence checks; all were labeled supported. Because the input contains conflicting retention statements and this sanitized artifact does not retain claim text/reasons, semantic correctness and conflict handling remain unverified. Do not describe this as full product acceptance.
+
+Six total model calls across four controlled runs cost exactly **$0.004800**, all settled, no unresolved reservations. Final pair cost $0.000740. Previous timeouts and parser failures remain part of the audit. No automatic retries, budget resets or model-role expansions were added. Dedicated credential stays local and ignored; native All models scope remains the explicitly approved temporary exception, not a native two-model restriction.
+
+Offline tests: **85/85 plus full syntax checks pass**. Preflight deadline max20s; inference deadline default/max120s. Extractor reasoning_effort:none is opt-in and effect unverified; reviewer max output tokens is bounded1..4096 and shared by price estimation and request payload. Native tools, guardrails and fallback execution remain unverified. The default web UI remains OFFLINE_FIXTURE.
+
+Next: preserve full synthetic claim/reason evidence safely and assess conflict handling before a real demo; do not claim successful semantics from exact-quote existence. No contest submission, public publication or owner-voice demo has been completed.
+
+Evidence: [current report](qa/LIVE_ACCEPTANCE_20261103.md), [sanitized transport artifact](qa/LIVE_TRANSPORT_20261103.json).
+
+## Historical audit notes below (not current instructions)
+
 # State — 2026-11-03 04:10 UTC
 
 Current offline validation: **78/78 tests and full syntax checks pass**. Safe output diagnostics now retain only bounded length counts, enum finish reason and parser category; no raw response or reasoning. These diagnostics were added after the second failed response and cannot reconstruct it retroactively.
@@ -20,7 +38,7 @@ The original model output was not recovered: native Log View exposed no input/ou
 The reviewed inference deadline is now 120 seconds by default and maximum, strictly validated before credential/network use. The same abort signal covers POST and response-body parsing. No automatic retries were added; ambiguous outcomes still freeze the durable ledger. Original model roles, two-call maximum and budgets remain unchanged. **74/74 tests pass** with focused syntax checks; source remains private.
 
 
-## Current status
+## Historical first-run status (superseded by latest sections above)
 
 OFFLINE_MVP_COMPLETE / AUTHENTICATION_VERIFIED / LIVE_INFERENCE_BLOCKED.
 
@@ -56,7 +74,7 @@ One-shot enrollment helper added with isolated dummy tests and exact-model-ID no
 
 Pre-rotation hardening: exact two-model request/served-identity guard, temporary native All-models limitation explicitly labeled, hosted-family format gate rejects stale public clipboard marker, known billing retained on output failures. 57 offline tests pass. Actual dedicated credential authentication and inference remain unverified; no real API call performed by the implementation runner.
 
-## Delayed issuer trace observed after initial timeout
+## Historical delayed issuer trace before settlement
 
 At 04:10 UTC the setup worker refreshed the native issuer UI and found the one matching request, ID `32e7a581-3d83-48c7-b588-cc98764a9254`, reported **Success**, provider DeepInfra, model `Qwen/Qwen3.5-35B-A3B`, duration **68 seconds**, 547 input tokens and 1400 output tokens. The UI displayed total **$0.0015**, with meter amounts input $0.0000766 and output $0.0014. These displayed values are not an exact wire `cost_usd` settlement string; do not substitute the rounded total for authoritative settlement. The browser displayed start time 2026-11-03 13:08:50.139 without verified timezone, so it is not represented as UTC.
 

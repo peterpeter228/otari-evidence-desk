@@ -1,3 +1,29 @@
+# Live acceptance — latest 2026-11-03 04:19 UTC
+
+## Current conclusion
+
+**Authenticated hosted two-model transport, model identity, JSON parsing and literal citation-presence checks passed. Semantic accuracy is unverified; not submission-ready.**
+
+Completed run `24367009-0aaa-4fb0-b4a5-736e081396eb` at 04:19:15.242 UTC:
+- Extractor Qwen, DeepInfra, request `e92cd039-ff41-4068-8381-99aaf725d0eb`, exact cost `"0.000610"`.
+- Reviewer GPT-OSS-20B, DeepInfra, request `f814159d-6998-4b5e-b0f4-a48176ba07a6`, exact cost `"0.000130"`.
+- Both finish reason stop, valid JSON; seven claims all literal citations verified, all reviewer verdicts supported.
+- Final pair **$0.000740**, all six calls across four runs **$0.004800**, all settled. No unsettled reservations.
+
+The synthetic inputs deliberately contain conflicting Atlas retention periods. This sanitized artifact omits claim text and reviewer reasoning, so the all-supported output cannot establish whether claims were correctly qualified or the conflict was overlooked. Do not infer semantic success or failure without those missing details. Exact citation matching is not truth verification. Native guardrails were explicitly off/unverified; no native tool/fallback execution is claimed. The requested reasoning-effort control's exact model effect remains unverified.
+
+## Intermediate compatibility run
+
+The third run reached both roles. Extractor `c4c3f343-a38c-4582-8fb3-1e9a5f3ee506` settled $0.000881. Reviewer `0aa60059-1fc0-42ae-919f-880f471cea2e` settled $0.000225 but failed JSON parsing with finish reason length, content length1761 and reasoning length3706. These diagnostics support a bounded output-budget investigation, not a general provider-quality claim.
+
+The reviewed fix allows reviewerMaxOutputTokens1..4096 (default1400), shared with conservative estimation. Extractor remains1400. The successful run used the reviewed bounded configuration. Inference deadline default/max120s, preflight default/max20s, no automatic retries. **85/85 tests and full syntax checks pass**.
+
+## Evidence and next step
+
+[Sanitized transport JSON](LIVE_TRANSPORT_20261103.json) preserves exact request/cost metadata and local reservation history, without credentials, private account configuration, raw reasoning or customer data. Preserve prior failures and settlements below. Next verify full synthetic claims/reasons and contradiction handling before presenting a quality claim or participant demo.
+
+## Historical audit snapshots (superseded by current conclusion above)
+
 # Live acceptance — 2026-11-03
 
 Current offline validation: **78/78 tests and full syntax checks pass**. Safe output diagnostics now retain only bounded length counts, enum finish reason and parser category; no raw response or reasoning. These diagnostics were added after the second failed response and cannot reconstruct it retroactively.
@@ -20,7 +46,7 @@ The original model output was not recovered: native Log View exposed no input/ou
 The reviewed inference deadline is now 120 seconds by default and maximum, strictly validated before credential/network use. The same abort signal covers POST and response-body parsing. No automatic retries were added; ambiguous outcomes still freeze the durable ledger. Original model roles, two-call maximum and budgets remain unchanged. **74/74 tests pass** with focused syntax checks; source remains private.
 
 
-## Verified scope and result
+## Historical first-run snapshot: before settlement recovery
 
 The setup workflow verified dedicated credential enrollment locally and authenticated read-only models/tools discovery (HTTP 200). Both approved model IDs were present. This proves authentication/catalog access, not working inference or contest scoring.
 
@@ -30,7 +56,7 @@ Evidence identifiers: acceptance artifact `65266f2f-b4b5-49fa-af95-cf05f4f640a8`
 
 At 04:09 UTC the setup worker observed no usage/requests in the issuer UI. Absence at that time cannot establish that no provider call ran or no charge will settle. There was no automatic retry. Additional inference stays frozen until reconciliation. Unknown outcome is not a successful demo, nor evidence that billing is zero.
 
-## Engineering fixes and verification
+## Historical first-run engineering snapshot (25-second inference at that time)
 
 - Preflight models/tools GETs use a default 20-second per-endpoint deadline, configurable only within 1–20000 ms. Failures distinguish timeout, transport, invalid JSON and HTTP status without raw error fragments. No automatic retry.
 - Inference remains capped at 25 seconds. Exact model roles, two-call maximum, $0.05 per-call reservation and durable $1 cumulative cap are unchanged.
@@ -40,11 +66,11 @@ At 04:09 UTC the setup worker observed no usage/requests in the issuer UI. Absen
 
 Official contract: https://github.com/mozilla-ai/otari/blob/main/docs/api-reference.md#request-id-and-inline-cost (read 2026-11-03). A proposed `docs/hybrid-mode-protocol.md` source was unavailable (404) and was not used as evidence.
 
-## Next step and stop condition
+## Historical first-run stop condition (later resolved)
 
 Obtain issuer-supported evidence for the first uncertain request before changing the held reservation. Without an authoritative result, remain blocked and do not resend. Do not claim complete dual-model acceptance or native guardrails/tool execution.
 
-## Delayed issuer trace observed after initial timeout
+## Historical delayed issuer trace: before exact settlement
 
 At 04:10 UTC the setup worker refreshed the native issuer UI and found the one matching request, ID `32e7a581-3d83-48c7-b588-cc98764a9254`, reported **Success**, provider DeepInfra, model `Qwen/Qwen3.5-35B-A3B`, duration **68 seconds**, 547 input tokens and 1400 output tokens. The UI displayed total **$0.0015**, with meter amounts input $0.0000766 and output $0.0014. These displayed values are not an exact wire `cost_usd` settlement string; do not substitute the rounded total for authoritative settlement. The browser displayed start time 2026-11-03 13:08:50.139 without verified timezone, so it is not represented as UTC.
 

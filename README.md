@@ -2,7 +2,9 @@
 
 A small, evidence-first comparison desk: import up to three public source texts or HTTPS pages, inspect cited claims, challenge the claims independently, and export a traceable research brief.
 
-**Current status: runnable OFFLINE_FIXTURE MVP + hosted adapter scaffold. NOT submission-ready. No real model calls or native Otari features have been verified.** Arbitrary inputs remain insufficient; the exact synthetic example illustrates three verdicts using disclosed predefined expectations, not AI. Exact quote matching cannot prove a claim is true.
+**Current status: offline UI MVP + live hosted dual-model CLI transport verified on synthetic inputs. NOT submission-ready. Semantic conflict handling remains unverified; native advanced feature execution remains unverified.** Arbitrary inputs remain insufficient; the exact synthetic example illustrates three verdicts using disclosed predefined expectations, not AI. Exact quote matching cannot prove a claim is true.
+
+A controlled live run on 2026-11-03 completed Qwen extraction and GPT-OSS-20B review, valid JSON and seven literal citation-presence checks. All six calls during integration testing settled to $0.004800. The final all-supported verdicts do not establish semantic accuracy: the synthetic sources conflict and full claim/reason evidence was not retained in that run. The web UI still uses disclosed offline fixtures. See [current live evidence](docs/qa/LIVE_ACCEPTANCE_20261103.md).
 
 ## Run locally
 
@@ -39,9 +41,9 @@ In fixture mode steps 2–3 are deterministic non-model fixtures. Live mode is d
 
 ## Otari integration plan
 
-`src/provider.js` accepts only explicitly configured hosted origins `https://otari.ai` or `https://api.otari.ai` with an explicit `otari-key` or `bearer` auth scheme. On 2026-11-02 the current hosted onboarding UI showed `https://otari.ai/api/v1` and the `Otari-Key` header; public repository docs also describe a different API host/Bearer convention. This UI observation is not a successful API call. No automatic cross-host/auth fallback is allowed. Preflight discovers models/tools, requires two distinct catalog IDs with open-weight evidence and a positive reservation. The adapter requests native block-mode prompt-injection guardrails. It preserves Otari request/provider/model/fallback/attempt headers and cost metadata.
+`src/provider.js` accepts only explicitly configured hosted origins `https://otari.ai` or `https://api.otari.ai` with an explicit `otari-key` or `bearer` auth scheme. On 2026-11-02 the current hosted onboarding UI showed `https://otari.ai/api/v1` and the `Otari-Key` header; public repository docs also describe a different API host/Bearer convention. That original 2026-11-02 UI observation alone was not a successful API call; the 2026-11-03 CLI evidence above now verifies hosted discovery and dual-model transport. No automatic cross-host/auth fallback is allowed. Preflight discovers models/tools, requires two distinct catalog IDs with open-weight evidence and a positive reservation. The adapter requests native block-mode prompt-injection guardrails. It preserves Otari request/provider/model/fallback/attempt headers and cost metadata.
 
-Before enabling real inference, confirm authorization, deployed OpenAPI, model cards, exact pricing/conservative budget, native guardrail availability, and approved unsettled-cost reconciliation. Never put an API key into source, browser, report or chat. See [live checklist](docs/LIVE_ACCEPTANCE.md).
+For each further authorized run, retain verified deployed OpenAPI, model cards, fresh pricing/conservative budget and native budget controls. Native guardrails remain explicitly off/unverified; reconciliation of the earlier timed-out request is recorded. Never put an API key into source, browser, report or chat. See [live checklist](docs/LIVE_ACCEPTANCE.md).
 
 ## Competition handoff
 

@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "mode": "LIVE",
+  "createdAt": "2026-11-03T04:19:15.242Z",
+  "id": "24367009-0aaa-4fb0-b4a5-736e081396eb",
+  "submissionReady": false,
+  "sourceMode": "synthetic acceptance fixtures",
+  "claims": [
+    {
+      "id": "C1",
+      "verdict": "supported",
+      "citationVerified": true
+    },
+    {
+      "id": "C2",
+      "verdict": "supported",
+      "citationVerified": true
+    },
+    {
+      "id": "C3",
+      "verdict": "supported",
+      "citationVerified": true
+    },
+    {
+      "id": "C4",
+      "verdict": "supported",
+      "citationVerified": true
+    },
+    {
+      "id": "C5",
+      "verdict": "supported",
+      "citationVerified": true
+    },
+    {
+      "id": "C6",
+      "verdict": "supported",
+      "citationVerified": true
+    },
+    {
+      "id": "C7",
+      "verdict": "supported",
+      "citationVerified": true
+    }
+  ],
+  "trace": [
+    {
+      "role": "extractor",
+      "requestId": "e92cd039-ff41-4068-8381-99aaf725d0eb",
+      "modelRequested": "alibaba/qwen-3.5-35b-a3b",
+      "modelServed": "Qwen/Qwen3.5-35B-A3B",
+      "provider": "deepinfra",
+      "actualCostUsd": 0.00061,
+      "reportedCostUsdString": "0.000610",
+      "pricingSource": "deployment",
+      "fallback": "false",
+      "attemptCount": "1",
+      "nativeGuardrailStatus": "disabled-explicitly-unverified",
+      "outputDiagnostics": {
+        "finishReason": "stop",
+        "contentLength": 1706,
+        "reasoningLength": null,
+        "parserCategory": "valid_json",
+        "reasoningEffortRequested": "none",
+        "reasoningControlEffect": "unverified"
+      }
+    },
+    {
+      "role": "reviewer",
+      "requestId": "f814159d-6998-4b5e-b0f4-a48176ba07a6",
+      "modelRequested": "openai/gpt-oss-20b",
+      "modelServed": "openai/gpt-oss-20b",
+      "provider": "deepinfra",
+      "actualCostUsd": 0.00013,
+      "reportedCostUsdString": "0.000130",
+      "pricingSource": "deployment",
+      "fallback": "false",
+      "attemptCount": "1",
+      "nativeGuardrailStatus": "disabled-explicitly-unverified",
+      "outputDiagnostics": {
+        "finishReason": "stop",
+        "contentLength": 1124,
+        "reasoningLength": 2137,
+        "parserCategory": "valid_json",
+        "reasoningEffortRequested": null,
+        "reasoningControlEffect": "unverified"
+      }
+    }
+  ],
+  "budget": {
+    "kind": "application-local single process; not authenticated tenant budget",
+    "reservations": [
+      {
+        "user": "local-session",
+        "run": "63b61879-f0ab-4697-8ff4-a5cbc6e906d9",
+        "held": 0.001477,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "32e7a581-3d83-48c7-b588-cc98764a9254",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b",
+          "reconciliationSource": "https://otari.ai/api/v1/usage/requests/32e7a581-3d83-48c7-b588-cc98764a9254",
+          "costUsdString": "0.001477",
+          "originalOutcome": "UNKNOWN_GATEWAY_OUTCOME",
+          "outputRecovered": false
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "91832fc0-ee61-4403-a5b3-987b58b7d55c",
+        "held": 0.001477,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "13166859-ff58-4d69-94c8-b230e4a8ed4d",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "3c036b67-3cdd-4705-954c-ea6ff603b645",
+        "held": 0.000881,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "c4c3f343-a38c-4582-8fb3-1e9a5f3ee506",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "3c036b67-3cdd-4705-954c-ea6ff603b645",
+        "held": 0.000225,
+        "status": "settled",
+        "evidence": {
+          "role": "reviewer",
+          "requestId": "0aa60059-1fc0-42ae-919f-880f471cea2e",
+          "modelRequested": "openai/gpt-oss-20b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "24367009-0aaa-4fb0-b4a5-736e081396eb",
+        "held": 0.00061,
+        "status": "settled",
+        "evidence": {
+          "role": "extractor",
+          "requestId": "e92cd039-ff41-4068-8381-99aaf725d0eb",
+          "modelRequested": "alibaba/qwen-3.5-35b-a3b"
+        }
+      },
+      {
+        "user": "local-session",
+        "run": "24367009-0aaa-4fb0-b4a5-736e081396eb",
+        "held": 0.00013,
+        "status": "settled",
+        "evidence": {
+          "role": "reviewer",
+          "requestId": "f814159d-6998-4b5e-b0f4-a48176ba07a6",
+          "modelRequested": "openai/gpt-oss-20b"
+        }
+      }
+    ]
+  },
+  "nativeCapabilities": "discovered availability is not execution proof",
+  "semanticAccuracy": "unverified",
+  "nativeModelRestriction": "not_enforced_user_approved_temporary",
+  "applicationModelRestriction": [
+    "alibaba/qwen-3.5-35b-a3b",
+    "openai/gpt-oss-20b"
+  ]
+}

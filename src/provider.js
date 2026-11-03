@@ -14,6 +14,16 @@ export function inferenceTimeoutMs(config){
  if(!Number.isInteger(value)||value<1||value>120000)throw new Error('INVALID_INFERENCE_TIMEOUT');
  return value;
 }
+export function extractorReasoningEffort(config){
+ const value=config.extractorReasoningEffort;
+ if(value!==undefined&&value!=='none')throw new Error('INVALID_EXTRACTOR_REASONING_EFFORT');
+ return value;
+}
+export function outputTokenLimit(config,role){
+ const value=config.reviewerMaxOutputTokens===undefined?1400:config.reviewerMaxOutputTokens;
+ if(!Number.isInteger(value)||value<1||value>4096)throw new Error('INVALID_REVIEWER_OUTPUT_LIMIT');
+ return role==='extractor'?1400:value;
+}
 export function outputDiagnostics(body){
  const choice=body?.choices?.[0],message=choice?.message;
  const content=message?.content,reasoning=message?.reasoning_content??message?.reasoning;
@@ -30,6 +40,8 @@ export class OtariProvider {
   this.ready=false;
   const c=this.config;
   inferenceTimeoutMs(c);
+  extractorReasoningEffort(c);
+  outputTokenLimit(c,'reviewer');
   const timeoutMs=c.preflightTimeoutMs??20000;
   if(!Number.isInteger(timeoutMs)||timeoutMs<1||timeoutMs>20000)throw new Error('INVALID_PREFLIGHT_TIMEOUT');
   if(!c.authorized||!c.apiKey||!c.extractModel||!c.reviewModel||c.extractModel===c.reviewModel)throw new Error('LIVE_UNCONFIGURED: explicit authorization and distinct model IDs required');
@@ -54,15 +66,17 @@ export class OtariProvider {
  async complete(role,payload){
   if(!this.ready)throw new Error('LIVE_UNCONFIGURED: preflight required');
   const timeoutMs=inferenceTimeoutMs(this.config);
+  const extractorEffort=extractorReasoningEffort(this.config);
+  const maxOutputTokens=outputTokenLimit(this.config,role);
   const model=role==='extractor'?this.config.extractModel:this.config.reviewModel;
   const started=Date.now();let response;
-  try{response=await this.fetch(`${this.config.baseUrl.replace(/\/$/,'')}/chat/completions`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(timeoutMs),headers:{...this.authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0,max_tokens:1400,...(this.config.nativeGuardrailMode==='off-unverified'?{}:{guardrails:[{profile:'prompt-injection',mode:'block'}]}),...(this.config.responseFormat==='json_object'?{response_format:{type:'json_object'}}:{}),messages:[{role:'system',content:role==='extractor'?EXTRACT_SYSTEM:REVIEW_SYSTEM},{role:'user',content:JSON.stringify(payload)}]})});}
+  try{response=await this.fetch(`${this.config.baseUrl.replace(/\/$/,'')}/chat/completions`,{method:'POST',redirect:'error',signal:AbortSignal.timeout(timeoutMs),headers:{...this.authHeaders(),'Content-Type':'application/json'},body:JSON.stringify({model,temperature:0,max_tokens:maxOutputTokens,...(role==='extractor'&&extractorEffort==='none'?{reasoning_effort:'none'}:{}),...(this.config.nativeGuardrailMode==='off-unverified'?{}:{guardrails:[{profile:'prompt-injection',mode:'block'}]}),...(this.config.responseFormat==='json_object'?{response_format:{type:'json_object'}}:{}),messages:[{role:'system',content:role==='extractor'?EXTRACT_SYSTEM:REVIEW_SYSTEM},{role:'user',content:JSON.stringify(payload)}]})});}
   catch {throw new UnknownOutcomeError('Gateway outcome unknown; reservation held, no automatic retry');}
   const requestId=response.headers.get('Otari-Request-ID');
   if(!response.ok)throw new UnknownOutcomeError(`Gateway HTTP ${response.status}; reconciliation required, no fallback/retry`,requestId);
   let body;try{body=await response.json();}catch{throw new UnknownOutcomeError('Unreadable response; billing outcome unknown',requestId);}
   const cost=parseInlineCost(body.usage);
-  const trace={role,modelRequested:model,modelServed:response.headers.get('Otari-Model')||body.model||null,modelServedSource:response.headers.get('Otari-Model')?'header':body.model?'body':'missing',provider:response.headers.get('Otari-Provider'),requestId,fallback:response.headers.get('Otari-Fallback'),attemptCount:response.headers.get('Otari-Attempt-Count'),latencyMs:Date.now()-started,usage:body.usage||null,actualCostUsd:cost,reportedCostUsdString:cost!==null?body.usage.cost_usd:null,pricingSource:cost!==null?body.usage.pricing_source:null,outputDiagnostics:outputDiagnostics(body),nativeToolCalls:body.otari_tool_calls||[],nativeGuardrailStatus:this.config.nativeGuardrailMode==='off-unverified'?'disabled-explicitly-unverified':'requested-not-independently-verified',mode:'LIVE'};
+  const trace={role,modelRequested:model,modelServed:response.headers.get('Otari-Model')||body.model||null,modelServedSource:response.headers.get('Otari-Model')?'header':body.model?'body':'missing',provider:response.headers.get('Otari-Provider'),requestId,fallback:response.headers.get('Otari-Fallback'),attemptCount:response.headers.get('Otari-Attempt-Count'),latencyMs:Date.now()-started,usage:body.usage||null,actualCostUsd:cost,reportedCostUsdString:cost!==null?body.usage.cost_usd:null,pricingSource:cost!==null?body.usage.pricing_source:null,outputDiagnostics:{...outputDiagnostics(body),reasoningEffortRequested:role==='extractor'&&extractorEffort==='none'?'none':null,reasoningControlEffect:'unverified'},nativeToolCalls:body.otari_tool_calls||[],nativeGuardrailStatus:this.config.nativeGuardrailMode==='off-unverified'?'disabled-explicitly-unverified':'requested-not-independently-verified',mode:'LIVE'};
   let output;try{if(trace.outputDiagnostics.parserCategory!=='unparsed')throw Error();output=JSON.parse(body.choices[0].message.content);trace.outputDiagnostics.parserCategory='valid_json';}catch{if(trace.outputDiagnostics.parserCategory==='unparsed')trace.outputDiagnostics.parserCategory='invalid_json';throw new GatewayResponseError('INVALID_STRUCTURED_OUTPUT',trace);}
   return {output,trace};
  }

@@ -28,7 +28,7 @@ Discovery may be used to obtain pricing metadata before a complete pricing snaps
 ## Limits and accounting
 
 - Only the built-in synthetic 3-source fixture can be sent by this acceptance runner.
-- Maximum 2 inference requests, output maximum 1400 tokens per request.
+- Maximum 2 inference requests. Extractor output cap is 1400 tokens; reviewer defaults to 1400 and may opt into a cap up to 4096.
 - Conservative input upper bound: UTF-8 byte count of payload/system prompt + 1024 overhead tokens; reject if context or verified price bound exceeds $0.05.
 - Reserve $0.05 before each call, $0.10 maximum per run and $1 cumulative for the fixed local identity across restarts. Native budget is a separate required control.
 - Durable reservation is flushed before dispatch. Crash-reserved entries become unsettled on next open. Unknown costs, unknown outcome or actual cost exceeding reservation freeze new calls pending manual reconciliation.
@@ -65,3 +65,13 @@ Public documentation checked 2026-11-03:
 - https://deepinfra.com/Qwen/Qwen3.5-35B-A3B/api confirms the exact raw model ID, thinking mode and JSON support.
 - https://docs.deepinfra.com/chat/reasoning documents `reasoning_effort: "none"` generally, but does not explicitly establish its effect on this exact Qwen model.
 - https://github.com/mozilla-ai/otari/blob/main/docs/public/openapi.json includes `reasoning_effort` (including `none`) and `max_completion_tokens` precedence over `max_tokens`; `chat_template_kwargs` is not listed. This public schema is not proof of deployed provider behavior.
+
+## Bounded extractor reasoning compatibility option
+
+`extractorReasoningEffort` is omitted by default. The only supported opt-in value is `"none"`; any other value fails before secret loading or network. This sends top-level `reasoning_effort: "none"` only on the extractor request, never on the reviewer. No `extra_body` or `chat_template_kwargs` are sent. The generic DeepInfra documentation and Otari schema support testing this option; its actual effect on this exact model remains **unverified** until observed. Evidence explicitly records the requested setting and unverified effect. Output remains capped at 1400 tokens, timeout at 120 seconds, and accounting/retry rules do not change.
+
+The exact raw response model ID `Qwen/Qwen3.5-35B-A3B`, documented on DeepInfra's model API page, is accepted only for the extractor when the actual `Otari-Provider` header is exactly `deepinfra`. Missing, differently cased or other provider values do not qualify. No fuzzy alias matching or UI-only provider inference is used.
+
+## Bounded reviewer output cap
+
+Optional `reviewerMaxOutputTokens` defaults to 1400 and accepts only integers 1–4096. Configuration is rejected before secret loading/network if invalid. A shared helper supplies the identical cap to conservative cost/context estimation and the POST `max_tokens`; the extractor remains at 1400. A larger reviewer cap does not change reasoning settings, the 120-second deadline, $0.05 reservation per call, $1 total cap, or freeze/no-retry rules. It addresses an observed reviewer `finish_reason: length`, not a guarantee of successful output.

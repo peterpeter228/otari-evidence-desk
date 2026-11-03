@@ -37,3 +37,8 @@ test('blocked artifact preserves safe diagnostics/provider, never raw reasoning 
  assert.equal(e.evidence.provider,'deepinfra');assert.equal(e.evidence.outputDiagnostics.finishReason,'length');assert.equal(e.evidence.outputDiagnostics.parserCategory,'invalid_json');assert.ok(!JSON.stringify(e.evidence).includes('private-broken'));assert.ok(!JSON.stringify(e.evidence).includes('private-reasoning'));return true;
  });}finally{rmSync(w.dir,{recursive:true});}
 });
+test('reasoning opt-in rejects unsupported values before secret loading',()=>{for(const value of ['auto','low',null,1])assert.throws(()=>validateAcceptanceConfig({...config(),extractorReasoningEffort:value}),/INVALID_EXTRACTOR_REASONING_EFFORT/);assert.doesNotThrow(()=>validateAcceptanceConfig({...config(),extractorReasoningEffort:'none'}));});
+test('reviewer output cap invalid values reject before secret/network',async()=>{
+ for(const value of [0,-1,4097,1.5,'4096',null])assert.throws(()=>validateAcceptanceConfig({...config(),reviewerMaxOutputTokens:value}),/INVALID_REVIEWER_OUTPUT_LIMIT/);
+ const w=workspace();let calls=0;try{await assert.rejects(runAcceptance({...w,live:true,execute:true,config:{...config(),reviewerMaxOutputTokens:4097},apiKey:'otk_v1_synthetic_secret_for_tests_only',fetchImpl:async()=>{calls++;}}),/INVALID_REVIEWER_OUTPUT_LIMIT/);assert.equal(calls,0);}finally{rmSync(w.dir,{recursive:true});}
+});
